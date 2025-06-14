@@ -5,6 +5,9 @@ import { UsuarioModule } from './usuario/usuario.module'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from './usuario/entities/usuario.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { PacientesModule } from './pacientes/pacientes.module';
+import { ENTITIES } from './entities';
 
 @Module({
   imports: [
@@ -19,12 +22,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get<string>('DB_USER')||'root',
         password: configService.get<string>('DB_PASSWORD')||'12345',
         database: configService.get<string>('DB_NAME'),
-        entities: [Usuario], 
-        synchronize: true,  
+        entities: ENTITIES, 
+        synchronize: false,  
       }),
       inject: [ConfigService],
     }), 
-    UsuarioModule],
+    UsuarioModule, AuthModule, PacientesModule],
   controllers: [AppController],
   providers: [AppService],
 })

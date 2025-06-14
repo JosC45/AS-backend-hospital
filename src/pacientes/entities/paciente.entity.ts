@@ -1,13 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-export enum ROLES{
-    ADMIN="admin",
-    MEDICO="medico",
-    SECRETARIA="secretaria"
-}
-
 @Entity()
-export class Usuario {
+export class Paciente {
     @PrimaryGeneratedColumn()
     id:number;
 
@@ -21,11 +15,14 @@ export class Usuario {
     correo:string;
 
     @Column()
-    contraseña:string;
-
-    @Column()
     dni:number;
 
     @Column()
-    rol:ROLES;
+    fecha_nacimiento:Date;
+
+    @Column()
+    domicilio:string;
+
+    @Column()
+    tipo_sangre:string;
 }
