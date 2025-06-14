@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PacientesModule } from './pacientes/pacientes.module';
 import { ENTITIES } from './entities';
+import { TriagesModule } from './triages/triages.module';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { ENTITIES } from './entities';
       }),
       inject: [ConfigService],
     }), 
-    UsuarioModule, AuthModule, PacientesModule],
+    UsuarioModule, AuthModule, PacientesModule, TriagesModule],
   controllers: [AppController],
   providers: [AppService],
 })

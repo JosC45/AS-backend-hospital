@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Triage } from "src/triages/entities/triage.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Paciente {
@@ -25,4 +26,7 @@ export class Paciente {
 
     @Column()
     tipo_sangre:string;
+
+    @OneToMany(()=>Triage,triage=>triage.paciente)
+    triages:Triage[]
 }
