@@ -9,6 +9,9 @@ import { AuthModule } from './auth/auth.module';
 import { PacientesModule } from './pacientes/pacientes.module';
 import { ENTITIES } from './entities';
 import { TriagesModule } from './triages/triages.module';
+import { MedicosModule } from './medicos/medicos.module';
+import { PersonalModule } from './personal/personal.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -28,7 +31,7 @@ import { TriagesModule } from './triages/triages.module';
       }),
       inject: [ConfigService],
     }), 
-    UsuarioModule, AuthModule, PacientesModule, TriagesModule],
+    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule],
   controllers: [AppController],
   providers: [AppService],
 })
