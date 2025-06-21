@@ -1,10 +1,11 @@
 import { Usuario } from "src/usuario/entities/usuario.entity";
-import { Column, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 export enum Tipo_Personal{
     SECRETARIA="secretaria",
     CAJERA="cajera"
 }
 
+@Entity()
 export class Personal {
     @PrimaryGeneratedColumn()
     id:number;
@@ -21,9 +22,8 @@ export class Personal {
     @Column()
     dni:string;
 
-    @Column({type:'enum'})
+    @Column({type:'enum',enum:Tipo_Personal})
     tipo:Tipo_Personal;
-
 
     @OneToOne(()=>Usuario,{cascade:true})
     @JoinColumn()

@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { TriagesService } from './triages.service';
 import { CreateTriageDto } from './dto/create-triage.dto';
 import { UpdateTriageDto } from './dto/update-triage.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('triages')
 export class TriagesController {
   constructor(private readonly triagesService: TriagesService) {}
 
+  // @UseGuards(JwtAuthGuard,RolesGuard)
+  // @Roles('admin')
   @Post('add')
   create(@Body() createTriageDto: CreateTriageDto) {
     return this.triagesService.create(createTriageDto);

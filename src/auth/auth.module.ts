@@ -3,8 +3,9 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule} from '@nestjs/jwt';
 import { UsuarioModule } from 'src/usuario/usuario.module';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports:[TypeOrmModule.forFeature([Usuario]),UsuarioModule,
@@ -13,6 +14,6 @@ import { UsuarioModule } from 'src/usuario/usuario.module';
               signOptions:{expiresIn:'3h'}
             })],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService,JwtStrategy],
 })
 export class AuthModule {}

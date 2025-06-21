@@ -21,6 +21,4 @@ export class Admin {
     @OneToOne(()=>Usuario,{cascade:true})
     @JoinColumn()
     usuario:Usuario;
-
-
 }

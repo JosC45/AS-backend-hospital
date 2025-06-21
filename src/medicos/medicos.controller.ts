@@ -7,27 +7,27 @@ import { UpdateMedicoDto } from './dto/update-medico.dto';
 export class MedicosController {
   constructor(private readonly medicosService: MedicosService) {}
 
-  @Post()
+  @Post('add')
   create(@Body() createMedicoDto: CreateMedicoDto) {
     return this.medicosService.create(createMedicoDto);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.medicosService.findAll();
   }
 
-  @Get(':id')
+  @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.medicosService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateMedicoDto: UpdateMedicoDto) {
     return this.medicosService.update(+id, updateMedicoDto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.medicosService.remove(+id);
   }

@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { BodyAuthDto } from './dto/body-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from 'src/usuario/entities/usuario.entity';
 import { Repository } from 'typeorm';
@@ -16,15 +15,15 @@ export class AuthService {
     private jwtService:JwtService
   ){}
   async validateUser(username:string,password:string) {
-    const user = await this.usuarioRepo.findOneBy({ correo:username });
-    if (!user || !(await bcrypt.compare(password, user.contraseña))) {
+    const user = await this.usuarioRepo.findOneBy({ username });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
     return user;
   }
 
   async login(user:Usuario){
-    const payload={sub:user.id, username:user.correo, role:user.rol}
+    const payload={sub:user.id, username:user.username, role:user.rol}
     return{
       access_token:this.jwtService.sign(payload)
     }
@@ -38,10 +37,7 @@ export class AuthService {
     return `This action returns a #${id} auth`;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
+  
   remove(id: number) {
     return `This action removes a #${id} auth`;
   }

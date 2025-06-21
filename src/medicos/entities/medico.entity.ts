@@ -24,7 +24,7 @@ export class Medico {
     @Column()
     dni:string;
 
-    @Column({type:'enum'})
+    @Column({type:'enum',enum:TIPO_MEDICO})
     tipo:TIPO_MEDICO;
 
     @Column({nullable:true})
