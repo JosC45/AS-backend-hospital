@@ -13,6 +13,7 @@ import { MedicosModule } from './medicos/medicos.module';
 import { PersonalModule } from './personal/personal.module';
 import { AdminModule } from './admin/admin.module';
 import { HistoriasModule } from './historias/historias.module';
+import { HospitalizacionModule } from './hospitalizacion/hospitalizacion.module';
 
 @Module({
   imports: [
@@ -32,7 +33,7 @@ import { HistoriasModule } from './historias/historias.module';
       }),
       inject: [ConfigService],
     }), 
-    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule],
+    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule],
   controllers: [AppController],
   providers: [AppService],
 })
