@@ -1,37 +1,30 @@
 import { IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, IsInt, isDateString, IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Estado_Hospitalizacion } from '../entities/hospitalizacion.entity';
+import { AREA_DESTINO, Estado_Hospitalizacion, INTERVENCION } from '../entities/hospitalizacion.entity';
 
 export class CreateHospitalizacionDto {
+    @IsEnum(INTERVENCION)
+    intervencion: INTERVENCION;
+
     @IsInt()
-    @IsNotEmpty()
-    id_paciente: number;
+    id_intervencion: number;
 
     @IsDateString()
-    @IsNotEmpty()
     fecha_ingreso: Date;
 
-    @IsDateString()
-    @IsOptional()
-    fecha_salida?: Date;
-
     @IsEnum(Estado_Hospitalizacion)
-    @IsNotEmpty()
     estado: Estado_Hospitalizacion;
 
     @IsInt()
-    @IsNotEmpty()
     id_cama: number;
 
     @IsString()
-    @IsNotEmpty()
     diagnostico_ingreso: string;
 
-    @IsString()
-    @IsNotEmpty()
-    recomendaciones_medicas: string;
+    @IsEnum(AREA_DESTINO)
+    area_destino: AREA_DESTINO;
 
-    @IsString()
-    @IsNotEmpty()
-    plan_seguimiento: string;
+    @IsInt()
+    id_medico: number;
+
 }

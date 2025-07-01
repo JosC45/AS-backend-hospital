@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { HospitalizacionService } from './hospitalizacion.service';
 import { CreateHospitalizacionDto } from './dto/create-hospitalizacion.dto';
 import { UpdateHospitalizacionDto } from './dto/update-hospitalizacion.dto';
+import { darAltaDto } from './dto/dar-alta.dto';
 
 @Controller('hospitalizacion')
 export class HospitalizacionController {
@@ -33,7 +34,7 @@ export class HospitalizacionController {
   }
 
   @Patch('darAlta/:id')
-  dar_alta(@Param('id') id:number){
-    return this.hospitalizacionService.changeState(+id)
+  dar_alta(@Param('id') id:number,@Body() body:darAltaDto){
+    return this.hospitalizacionService.changeState(+id,body)
   }
 }

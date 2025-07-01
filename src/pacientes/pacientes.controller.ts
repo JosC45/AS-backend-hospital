@@ -16,12 +16,13 @@ export class PacientesController {
     return this.pacientesService.create(createPacienteDto);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.pacientesService.findAll();
   }
 
-  @Get(':id')
+
+  @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.pacientesService.findOne(+id);
   }

@@ -17,12 +17,17 @@ export class TriagesController {
     return this.triagesService.create(createTriageDto);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.triagesService.findAll();
   }
 
-  @Get(':id')
+  @Get('listByHistoria/:id')
+  findByHistoria(@Param('id') id: string){
+    return this.triagesService.listByHistoria(+id)
+  }
+
+  @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.triagesService.findOne(+id);
   }

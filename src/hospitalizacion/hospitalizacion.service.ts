@@ -3,7 +3,8 @@ import { CreateHospitalizacionDto } from './dto/create-hospitalizacion.dto';
 import { UpdateHospitalizacionDto } from './dto/update-hospitalizacion.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Estado_Hospitalizacion, Hospitalizacion } from './entities/hospitalizacion.entity';
+import { AREA_DESTINO, Estado_Hospitalizacion, Hospitalizacion } from './entities/hospitalizacion.entity';
+import { darAltaDto } from './dto/dar-alta.dto';
 
 @Injectable()
 export class HospitalizacionService {
@@ -12,8 +13,8 @@ export class HospitalizacionService {
     private hospitalizacionRepo:Repository<Hospitalizacion>
   ){}
   async create(createHospitalizacionDto: CreateHospitalizacionDto) {
-    const {id_paciente,id_cama,...bodyHospitalizacion}=createHospitalizacionDto
-    const newHospitalizacion=this.hospitalizacionRepo.create({...bodyHospitalizacion,paciente:{id:id_paciente},cama:{id:id_cama}})
+    const {id_medico,id_cama,...bodyHospitalizacion}=createHospitalizacionDto
+    const newHospitalizacion=this.hospitalizacionRepo.create({...bodyHospitalizacion,medico:{id:id_medico},cama:{id:id_cama}})
     await this.hospitalizacionRepo.save(newHospitalizacion)
     return 'Se añadio una nueva hospitalizacion';
   }
@@ -23,6 +24,13 @@ export class HospitalizacionService {
     if(listHospitalizaciones.length===0)throw new NotFoundException("No se encontraron hospitalizaciones")
     
     return listHospitalizaciones;
+  }
+  
+  async findByArea(area_destino:AREA_DESTINO){
+    const listHospitalizacion=await this.hospitalizacionRepo.find({where:{area_destino},relations:['cama','medico'],select:['diagnostico_ingreso','fecha_ingreso','area_destino','cama','intervencion','id_intervencion']})
+    const hospitalizaciones=Promise.all(listHospitalizacion.map(async(hospit)=>{
+      
+    }))
   }
 
   async findOne(id: number) {
@@ -36,7 +44,7 @@ export class HospitalizacionService {
 
   async update(id: number, updateHospitalizacionDto: UpdateHospitalizacionDto) {
     const hospitalizacion=await this.findOne(id)
-    if(updateHospitalizacionDto.id_paciente) hospitalizacion.paciente={id:updateHospitalizacionDto.id_paciente} as any;
+    if(updateHospitalizacionDto.id_medico) hospitalizacion.medico={id:updateHospitalizacionDto.id_medico} as any;
     if(updateHospitalizacionDto.id_cama) hospitalizacion.cama={id:updateHospitalizacionDto.id_cama} as any
 
     Object.assign(hospitalizacion,updateHospitalizacionDto)
@@ -53,12 +61,15 @@ export class HospitalizacionService {
     }
   }
 
-  async changeState(id:number){
+  async changeState(id:number,bodyAlta:darAltaDto){
     const hospitalizacion=await this.findOne(id)
     if(hospitalizacion.estado===Estado_Hospitalizacion.ALTA)throw new BadRequestException("Esta hospitalizacion ya esta dada de alta")
     hospitalizacion.estado=Estado_Hospitalizacion.ALTA
     hospitalizacion.fecha_salida=new Date()
+    Object.assign(hospitalizacion,bodyAlta)
     await this.hospitalizacionRepo.save(hospitalizacion)
     return `Se dio de alta al paciente con id ${id}`
   }
+
+  
 }

@@ -1,34 +1,43 @@
-import { IsDateString, IsInt, IsNotEmpty, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { GENERO, SEGURO } from "../entities/paciente.entity";
 
 export class CreatePacienteDto {
-        @IsInt()
-        @IsNotEmpty()
-        id:number;
-    
         @IsString()
         @IsNotEmpty()
-        nombres:string;
-    
+        nombres: string;
+
         @IsString()
         @IsNotEmpty()
-        apellidos:string;
-    
-        @IsString()
+        apellidos: string;
+
+        @IsNumber()
         @IsNotEmpty()
-        correo:string;
-    
-        @IsInt()
-        @IsNotEmpty()
-        dni:number;
-    
+        dni: number;
+
         @IsDateString()
         @IsNotEmpty()
-        fecha_nacimiento:Date;
-    
-        @IsString()
-        domicilio:string;
-    
+        fecha_nacimiento: Date;
+
+        @IsEmail()
+        @IsNotEmpty()
+        correo: string;
+
         @IsString()
         @IsNotEmpty()
-        tipo_sangre:string;
+        numero: string;
+
+        @IsString()
+        domicilio: string;
+
+        @IsEnum(GENERO)
+        @IsNotEmpty()
+        genero: GENERO;
+
+        @IsEnum(SEGURO)
+        @IsNotEmpty()
+        seguro: SEGURO;
+        
+        @IsString()
+        @IsNotEmpty()
+        tipo_sangre: string;
 }

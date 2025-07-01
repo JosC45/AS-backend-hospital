@@ -1,12 +1,11 @@
-import { Paciente } from "src/pacientes/entities/paciente.entity";
+import { Historia } from "src/historias/entities/historia.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Prioridad{
-    MUY_ALTA="muy_alta",
-    ALTA="alta",
-    REGULAR="regular",
-    BAJO="bajo",
-    MUY_BAJO="muy bajo"
+    PRIORIDADI="Prioridad_I",
+    PRIORIDADII="Prioridad_II",
+    PRIORIDADIII="Prioridad_III",
+    PRIORIDADIV="Prioridad_IV"
 }
 
 @Entity()
@@ -14,25 +13,31 @@ export class Triage {
     @PrimaryGeneratedColumn()
     id:number;
 
-    @ManyToOne(()=>Paciente)
-    @JoinColumn({name:'id_paciente'})
-    paciente:Paciente;
+    @ManyToOne(()=>Historia)
+    @JoinColumn({name:'id_historia'})
+    historia:Historia;
 
     @Column()
-    latidos_pm:string;
+    motivo:string;
 
-    @Column()
+    @Column({default:'-'})
     presion_arterial:string;
 
-    @Column()
+    @Column({default:'-'})
+    latidos_pm:string;
+
+    @Column({default:'-'})
+    frecuencia_respiratoria:string;
+
+    @Column({type:'float',nullable:true})
     temperatura:number;
 
     @Column({type:'enum',enum:Prioridad})
     prioridad:Prioridad;
 
+    @Column({default:'-'})
+    observaciones:string;
+    
     @Column()
-    motivo:string;
-
-    @Column()
-    observaciones:string
+    fecha_creacion:Date
 }

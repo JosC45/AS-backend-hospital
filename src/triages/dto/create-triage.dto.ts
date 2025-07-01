@@ -2,31 +2,35 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-valida
 import { Prioridad } from "../entities/triage.entity";
 
 export class CreateTriageDto {
-    @IsNotEmpty()
     @IsNumber()
-    id_paciente: number;
-
     @IsNotEmpty()
+    id_historia: number; // Relacionado con la entidad Historia
+
     @IsString()
-    latidos_pm: string;
-
     @IsNotEmpty()
-    @IsString()
-    presion_arterial: string;
-
-    @IsNotEmpty()
-    @IsNumber()
-    temperatura: number;
-
-    @IsNotEmpty()
-    @IsEnum(Prioridad)
-    prioridad: Prioridad;
-
-    @IsNotEmpty()
-    @IsString()
     motivo: string;
 
-    @IsOptional()
     @IsString()
+    @IsOptional()
+    presion_arterial?: string;
+
+    @IsString()
+    @IsOptional()
+    latidos_pm?: string;
+
+    @IsString()
+    @IsOptional()
+    frecuencia_respiratoria?: string;
+
+    @IsNumber()
+    @IsOptional()
+    temperatura?: number;
+
+    @IsEnum(Prioridad)
+    @IsNotEmpty()
+    prioridad: Prioridad;
+
+    @IsString()
+    @IsOptional()
     observaciones?: string;
 }

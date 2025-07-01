@@ -1,5 +1,17 @@
+import { Historia } from "src/historias/entities/historia.entity";
 import { Triage } from "src/triages/entities/triage.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
+export enum GENERO{
+    MASCULINO="masculino",
+    FEMENINO="femenino"
+}
+export enum SEGURO{
+    SIS="Sis",
+    ESSALUD="EsSalud",
+    EPS="EPS",
+    PARTICULAR="Particular"
+}
 
 @Entity()
 export class Paciente {
@@ -8,25 +20,35 @@ export class Paciente {
 
     @Column()
     nombres:string;
-
+    
     @Column()
     apellidos:string;
 
     @Column()
+    dni:number;
+    
+    @Column()
+    fecha_nacimiento:Date;
+    
+    @Column()
     correo:string;
 
     @Column()
-    dni:number;
-
-    @Column()
-    fecha_nacimiento:Date;
+    numero:string;
 
     @Column()
     domicilio:string;
 
+    @Column({type:"enum",enum:GENERO})
+    genero:GENERO;
+
+    @Column({type:"enum",enum:SEGURO})
+    seguro:SEGURO;
+
     @Column()
     tipo_sangre:string;
 
-    @OneToMany(()=>Triage,triage=>triage.paciente)
-    triages:Triage[]
+    @OneToOne(()=>Historia,{cascade:true})
+    @JoinColumn()
+    historia:Historia
 }

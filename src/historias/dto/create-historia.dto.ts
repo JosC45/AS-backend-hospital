@@ -6,10 +6,6 @@ export class CreateHistoriaDto {
     @IsNotEmpty()
     id_paciente: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    id_medico: number;
-
     @IsEnum(TIPO_CONSULTA)
     tipo_consulta: TIPO_CONSULTA;
 

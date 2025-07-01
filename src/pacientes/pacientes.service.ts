@@ -4,18 +4,21 @@ import { UpdatePacienteDto } from './dto/update-paciente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Paciente } from './entities/paciente.entity';
+import { HistoriasService } from 'src/historias/historias.service';
 
 @Injectable()
 export class PacientesService {
   constructor(
+    private readonly historiaService:HistoriasService,
+
     @InjectRepository(Paciente)
     private pacienteRepo:Repository<Paciente>
   ){}
   async create(createPacienteDto: CreatePacienteDto) {
-    const newPaciente=this.pacienteRepo.create(createPacienteDto)
-    await this.pacienteRepo.save(newPaciente)
-
-    return 'Se agrego un nuevo paciente';
+      const newPaciente=this.pacienteRepo.create(createPacienteDto)
+    const {id}=await this.pacienteRepo.save(newPaciente)
+    const response=await this.historiaService.create(id)
+    return `Se agrego un nuevo paciente,${response}`;
   }
 
   async findAll() {
@@ -38,6 +41,7 @@ export class PacientesService {
   async remove(id: number) {
     const deletedPaciente=await this.pacienteRepo.delete({id})
     if(deletedPaciente.affected===0)throw new BadRequestException("No se elimino ningun paciente")
-    return `Se elimino el paciente con id: ${id}`;
+    const responseHistoria=await this.historiaService.removeByPaciente(id)
+    return `Se elimino el paciente con id: ${id},${responseHistoria}`;
   }
 }

@@ -12,28 +12,57 @@ export class TriagesService {
     private triageRepo:Repository<Triage>
   ){}
   async create(createTriageDto: CreateTriageDto) {
-    const { id_paciente, ...triageData } = createTriageDto;
-    const newTriage=this.triageRepo.create({...triageData,paciente:{id:createTriageDto.id_paciente}})
+    const { id_historia, ...triageData } = createTriageDto;
+    const newTriage=this.triageRepo.create({...triageData,historia:{id:createTriageDto.id_historia},fecha_creacion:new Date()})
     await this.triageRepo.save(newTriage)
     return 'Se añadio correctamente el nuevo triage';
   }
 
   async findAll() {
-    const listTriages=await this.triageRepo.find()
+    const listTriages=await this.triageRepo
+    .createQueryBuilder('tri')
+    .innerJoin('tri.historia','hist')
+    .innerJoinAndSelect('hist.paciente','pac')
+    .select(['pac.nombres AS nombres','pac.apellidos AS apellidos','tri.motivo AS motivo','tri.prioridad AS prioridad','tri.fecha_creacion AS fecha_creacion',
+      'tri.presion_arterial AS presion_arterial','tri.latidos_pm AS latidos_pm','tri.temperatura AS temperatura'])
+    .getRawMany()
+
     if(listTriages.length===0)throw new NotFoundException("No se encontro triages")
     return listTriages;
   }
 
   async findOne(id: number) {
-    const OneTriage=await this.triageRepo.findOneByOrFail({id})
-    return OneTriage;
+    const oneTriage=await this.triageRepo
+    .createQueryBuilder('tri')
+    .innerJoin('tri.historia','hist')
+    .innerJoinAndSelect('hist.paciente','pac')
+    .select(['pac.nombres AS nombres','pac.apellidos AS apellidos','tri.motivo AS motivo','tri.prioridad AS prioridad','tri.fecha_creacion AS fecha_creacion',
+      'tri.presion_arterial AS presion_arterial','tri.latidos_pm AS latidos_pm','tri.temperatura AS temperatura'])
+    .where('tri.id=:id',{id})
+    .getRawOne()
+
+    return oneTriage;
+  }
+
+  async listByHistoria(id:number){
+    const listTriages=await this.triageRepo
+    .createQueryBuilder('tri')
+    .innerJoin('tri.historia','hist')
+    .innerJoinAndSelect('hist.paciente','pac')
+    .select(['pac.nombres AS nombres','pac.apellidos AS apellidos','tri.motivo AS motivo','tri.prioridad AS prioridad','tri.fecha_creacion AS fecha_creacion',
+      'tri.presion_arterial AS presion_arterial','tri.latidos_pm AS latidos_pm','tri.temperatura AS temperatura'])
+    .where('hist.id=:id',{id})
+    .getRawMany()
+
+    if(listTriages.length===0)throw new NotFoundException("No se encontro triages")
+    return listTriages;
   }
 
   async update(id: number, updateTriageDto: UpdateTriageDto) {
     const triage = await this.triageRepo.findOne({ where: { id } });
     if (!triage) throw new NotFoundException(`Triage con id ${id} no encontrado`);
 
-    if (updateTriageDto.id_paciente) triage.paciente = { id: updateTriageDto.id_paciente } as any;
+    if (updateTriageDto.id_historia) triage.historia = { id: updateTriageDto.id_historia } as any;
     
     Object.assign(triage, updateTriageDto);
     await this.triageRepo.save(triage);
