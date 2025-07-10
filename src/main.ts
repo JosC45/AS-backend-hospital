@@ -10,16 +10,7 @@ async function bootstrap() {
     whitelist:true,
     forbidNonWhitelisted:true
   }))
-  app.connectMicroservice({
-    transport: Transport.REDIS,
-    options: {
-      url: 'redis://localhost:6379',
-      extraOptions: {
-        'protected-mode': 'no',
-      },
-    },
-  }); 
-  await app.startAllMicroservices();
+  app.enableCors()
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

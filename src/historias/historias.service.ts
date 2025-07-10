@@ -48,8 +48,17 @@ export class HistoriasService {
   }
 
   async removeByPaciente(id:number){
-    const deleted=await this.historiaRepo.delete({paciente:{id}})
-    if(deleted.affected===0)throw new BadRequestException("No se elimino ningun registro")
-    return `Se elimino correctamente la historia clinica con id: ${id}`
+    const deleteResult = await this.historiaRepo
+    .createQueryBuilder('historia')
+    .leftJoin('historia.paciente', 'paciente')
+    .delete()
+    .where('paciente.id = :id', { id })
+    .execute();
+
+  if (deleteResult.affected === 0) {
+    throw new BadRequestException("No se eliminó ningún registro");
+  }
+
+  return `Se eliminó correctamente la(s) historia(s) clínica(s) del paciente con id: ${id}`;
   }
 }

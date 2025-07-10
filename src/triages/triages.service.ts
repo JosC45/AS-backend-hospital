@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTriageDto } from './dto/create-triage.dto';
 import { UpdateTriageDto } from './dto/update-triage.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -25,6 +25,7 @@ export class TriagesService {
     .innerJoinAndSelect('hist.paciente','pac')
     .select(['pac.nombres AS nombres','pac.apellidos AS apellidos','tri.motivo AS motivo','tri.prioridad AS prioridad','tri.fecha_creacion AS fecha_creacion',
       'tri.presion_arterial AS presion_arterial','tri.latidos_pm AS latidos_pm','tri.temperatura AS temperatura'])
+    .where('tri.estado=:estado',{estado:'proceso'})
     .getRawMany()
 
     if(listTriages.length===0)throw new NotFoundException("No se encontro triages")
@@ -74,6 +75,11 @@ export class TriagesService {
     await this.triageRepo.save(triage);
 
     return `Se actualizó correctamente el triage con id: #${id}`;
+  }
+  async finish(id:number){
+    const finished=await this.triageRepo.update({id},{estado:'finalizado'})
+    if(finished.affected===0) throw new BadRequestException("no se pudo finzliar el triaje fijese el id")
+    return `Se finalizo el triage con id ${id}`
   }
 
   async remove(id: number) {

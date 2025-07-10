@@ -37,6 +37,11 @@ export class TriagesController {
     return this.triagesService.update(+id, updateTriageDto);
   }
 
+  @Patch('finished/:id')
+  finish(@Param('id') id:string){
+    return this.triagesService.finish(+id)
+  }
+
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.triagesService.remove(+id);

@@ -67,9 +67,9 @@ export class PacientesService {
   }
 
   async remove(id: number) {
+    const responseHistoria=await this.historiaService.removeByPaciente(id)
     const deletedPaciente=await this.pacienteRepo.delete({id})
     if(deletedPaciente.affected===0)throw new BadRequestException("No se elimino ningun paciente")
-    const responseHistoria=await this.historiaService.removeByPaciente(id)
     return `Se elimino el paciente con id: ${id},${responseHistoria}`;
   }
 }

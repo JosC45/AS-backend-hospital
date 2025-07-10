@@ -37,6 +37,9 @@ export class Triage {
 
     @Column({default:'-'})
     observaciones:string;
+
+    @Column({default:'proceso'})
+    estado: 'proceso' | 'finalizado';
     
     @Column()
     fecha_creacion:Date

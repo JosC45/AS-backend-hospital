@@ -61,9 +61,13 @@ export class Consulta {
 
     @Column()
     fecha_creacion:Date;
+    
+    @Column({default:'proceso'})
+    estado: 'proceso' | 'finalizado';
 
     @ManyToOne(()=>Historia)
     @JoinColumn({name:'id_historia'})
     historia:Historia
+
 
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ConsultasService } from './consultas.service';
 import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
+import { throws } from 'assert';
 
 @Controller('consultas')
 export class ConsultasController {
@@ -22,6 +23,10 @@ export class ConsultasController {
     return this.consultasService.listByHistoria(+id)
   }
   
+  @Patch("finish/:id")
+  finally(@Param('id') id:string){
+    return this.consultasService.finish(+id)
+  }
   @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.consultasService.findOne(+id);

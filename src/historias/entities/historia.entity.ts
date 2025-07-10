@@ -16,6 +16,7 @@ export class Historia {
     id:number;
     
     @OneToOne(()=>Paciente,paciente=>paciente.historia)
+    @JoinColumn()
     paciente:Paciente;
 
     @OneToMany(()=>Triage,triage=>triage.historia)
