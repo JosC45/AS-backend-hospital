@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +10,16 @@ async function bootstrap() {
     whitelist:true,
     forbidNonWhitelisted:true
   }))
+  app.connectMicroservice({
+    transport: Transport.REDIS,
+    options: {
+      url: 'redis://localhost:6379',
+      extraOptions: {
+        'protected-mode': 'no',
+      },
+    },
+  }); 
+  await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMedicoDto } from './dto/create-medico.dto';
 import { UpdateMedicoDto } from './dto/update-medico.dto';
 import { UsuarioService } from 'src/usuario/usuario.service';
@@ -6,10 +6,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Medico } from './entities/medico.entity';
 import { Repository } from 'typeorm';
 import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class MedicosService {
   constructor(
+    @Inject('REDIS_EMITER') private client:ClientProxy,
     private readonly usuarioService:UsuarioService,
 
     @InjectRepository(Medico)
@@ -23,7 +25,7 @@ export class MedicosService {
     const newMedico=this.medicoRepo.create({...createMedicoDto,usuario:{id}})
 
     await this.medicoRepo.save(newMedico)
-
+    await this.countMedicos()
     return 'El medico fue creado satisfactoriamente con su usuario';
   }
 
@@ -33,6 +35,16 @@ export class MedicosService {
     return listMedicos;
   }
 
+  async countMedicos(){
+    const [,numeroMedicos]=await this.medicoRepo.findAndCount()
+    this.client.emit('cantidad_medicos',{
+      total: numeroMedicos,
+      source: 'medicos_service',
+      updatedAt: new Date(),
+    })
+    console.log('🔴 Emitiendo cantidad_pacientes:', numeroMedicos);
+
+  }
   async findOne(id: number) {
     try{
       const oneMedico=await this.medicoRepo.findOneByOrFail({id})

@@ -8,5 +8,6 @@ import { Triage } from './entities/triage.entity';
   imports:[TypeOrmModule.forFeature([Triage])],
   controllers: [TriagesController],
   providers: [TriagesService],
+  exports:[TriagesService]
 })
 export class TriagesModule {}

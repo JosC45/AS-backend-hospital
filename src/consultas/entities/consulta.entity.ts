@@ -27,7 +27,7 @@ export class Consulta {
     tiempo_enfermedad:string;
 
     @Column({default:'-'})
-    presion_arterial:string;
+        presion_arterial:string;
 
     @Column({default:'-'})
     latidos_pm:string;

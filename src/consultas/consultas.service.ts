@@ -1,13 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Consulta } from './entities/consulta.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ConsultasService {
   constructor(
+    @Inject('REDIS_EMITER') private client:ClientProxy,
+
     @InjectRepository(Consulta)
     private consultaRepo:Repository<Consulta>
   ){}
@@ -16,15 +19,19 @@ export class ConsultasService {
     const {id_historia,id_medico,...bodyConsulta}=createConsultaDto
     const newConsulta=this.consultaRepo.create({...bodyConsulta,historia:{id:id_historia},medico:{id:id_medico},fecha_creacion:new Date()})
     await this.consultaRepo.save(newConsulta)
+    this.client.emit('consulta_creada',newConsulta)
     return 'Se añadio correctamente la consulta';
   }
+
 
   findAll() {
     return `This action returns all consultas`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} consulta`;
+  async findOne(id: number) {
+    const consulta=await this.consultaRepo.findOne({where:{id},relations:['historia']})
+    if(!consulta)throw new NotFoundException("No se encontro la consulta con ese id")
+    return consulta
   }
 
   async listByHistoria(id:number){

@@ -15,6 +15,8 @@ import { AdminModule } from './admin/admin.module';
 import { HistoriasModule } from './historias/historias.module';
 import { HospitalizacionModule } from './hospitalizacion/hospitalizacion.module';
 import { ConsultasModule } from './consultas/consultas.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RedisClientModule } from './redis-client.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { ConsultasModule } from './consultas/consultas.module';
       }),
       inject: [ConfigService],
     }), 
+    RedisClientModule,
     UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule, ConsultasModule],
   controllers: [AppController],
   providers: [AppService],

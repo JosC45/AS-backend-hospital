@@ -31,6 +31,12 @@ export class TriagesService {
     return listTriages;
   }
 
+  async listOne(id:number){
+    const triage=await this.triageRepo.findOne({where:{id},relations:['historia']})
+    if(!triage)throw new NotFoundException("No se encontro la consulta con ese id")
+    return triage
+  }
+
   async findOne(id: number) {
     const oneTriage=await this.triageRepo
     .createQueryBuilder('tri')

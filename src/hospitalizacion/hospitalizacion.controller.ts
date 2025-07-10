@@ -3,6 +3,7 @@ import { HospitalizacionService } from './hospitalizacion.service';
 import { CreateHospitalizacionDto } from './dto/create-hospitalizacion.dto';
 import { UpdateHospitalizacionDto } from './dto/update-hospitalizacion.dto';
 import { darAltaDto } from './dto/dar-alta.dto';
+import { AREA_DESTINO } from './entities/hospitalizacion.entity';
 
 @Controller('hospitalizacion')
 export class HospitalizacionController {
@@ -21,6 +22,16 @@ export class HospitalizacionController {
   @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.hospitalizacionService.findOne(+id);
+  }
+
+  @Get('alta')
+  listAlta(){
+    return this.hospitalizacionService.findAlta()
+  }
+
+  @Get('area/:area')
+  listByArea(@Param('area') area:AREA_DESTINO){
+    return this.hospitalizacionService.findByArea(area)
   }
 
   @Patch('update/:id')
