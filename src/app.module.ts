@@ -18,6 +18,8 @@ import { ConsultasModule } from './consultas/consultas.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RedisClientModule } from './redis-client.module';
 import { NotasModule } from './notas/notas.module';
+import { OrdenesModule } from './ordenes/ordenes.module';
+import { CitasModule } from './citas/citas.module';
 
 @Module({
   imports: [
@@ -31,14 +33,14 @@ import { NotasModule } from './notas/notas.module';
         port: configService.get<number>('DB_PORT')||3306,
         username: configService.get<string>('DB_USER')||'root',
         password: configService.get<string>('DB_PASSWORD')||'12345',
-        database: configService.get<string>('DB_NAME'),
+        database: configService.get<string>('DB_NAME')||'Hospital',
         entities: ENTITIES, 
         synchronize: false,  
       }),
       inject: [ConfigService],
     }), 
     RedisClientModule,
-    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule, ConsultasModule, NotasModule],
+    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule, ConsultasModule, NotasModule, OrdenesModule, CitasModule],
   controllers: [AppController],
   providers: [AppService],
 })

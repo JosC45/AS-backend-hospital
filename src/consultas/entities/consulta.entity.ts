@@ -69,5 +69,4 @@ export class Consulta {
     @JoinColumn({name:'id_historia'})
     historia:Historia
 
-
 }
