@@ -8,8 +8,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'TCP_CLIENT',
         transport: Transport.TCP,
         options: {
-          host: '4.tcp.ngrok.io',
-          port: 17128,
+          host: '2.tcp.ngrok.io',
+          port: 13527,
         },
       },
     ]),
