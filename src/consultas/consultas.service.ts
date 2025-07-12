@@ -1,28 +1,58 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Consulta } from './entities/consulta.entity';
-import { Not, Repository } from 'typeorm';
+import { Between, Not, Repository } from 'typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class ConsultasService {
+export class ConsultasService implements OnModuleInit {
   constructor(
-    @Inject('REDIS_EMITER') private client:ClientProxy,
+    @Inject('TCP_CLIENT') private client:ClientProxy,
 
     @InjectRepository(Consulta)
     private consultaRepo:Repository<Consulta>
   ){}
 
+  async onModuleInit() {
+    console.log('🚀 ConsultasService iniciado, contando consultas...');
+    await this.counConsultasHoy();
+  }
+
   async create(createConsultaDto: CreateConsultaDto) {
     const {id_historia,id_medico,...bodyConsulta}=createConsultaDto
     const newConsulta=this.consultaRepo.create({...bodyConsulta,historia:{id:id_historia},medico:{id:id_medico},fecha_creacion:new Date(),estado:'proceso'})
     await this.consultaRepo.save(newConsulta)
-    this.client.emit('consulta_creada',newConsulta)
+    await this.counConsultasHoy();
     return 'Se añadio correctamente la consulta';
   }
 
+  async findConsultasDeHoy(): Promise<Consulta[]> {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); 
+  
+    const mañana = new Date();
+    mañana.setHours(23, 59, 59, 999); 
+  
+    const consultas = await this.consultaRepo.find({
+      where: {
+        fecha_atencion: Between(hoy, mañana),
+      },
+    });
+  
+    return consultas;
+  }
+
+  async counConsultasHoy(){
+    const consultasHoy = await this.findConsultasDeHoy();
+    this.client.emit('cantidad_consultas_hoy', {
+      total: consultasHoy.length,
+      source: 'consultas_service',
+      updatedAt: new Date(),
+    });
+    console.log('🔴 Emitiendo cantidad_consultas_hoy:', consultasHoy.length);
+  }
 
   findAll() {
     return `This action returns all consultas`;

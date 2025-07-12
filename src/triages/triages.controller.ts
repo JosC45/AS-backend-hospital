@@ -16,6 +16,10 @@ export class TriagesController {
   create(@Body() createTriageDto: CreateTriageDto) {
     return this.triagesService.create(createTriageDto);
   }
+  @Get('estadisticas')
+  getEstadisticasTriajesUltimos7Dias() {
+    return this.triagesService.getCantidadTriajesUltimos7Dias();
+  }
 
   @Get('all')
   findAll() {

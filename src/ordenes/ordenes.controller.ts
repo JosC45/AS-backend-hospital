@@ -17,12 +17,12 @@ export class OrdenesController {
     return this.ordenesService.findAll();
   }
 
-  @Get(':id')
+  @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.ordenesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateOrdeneDto: UpdateOrdeneDto) {
     return this.ordenesService.update(+id, updateOrdeneDto);
   }

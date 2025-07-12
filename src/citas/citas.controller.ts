@@ -16,6 +16,11 @@ export class CitasController {
   findAll() {
     return this.citasService.findAll();
   }
+  
+  @Get('hoy')
+  getCitasDeHoy() {
+    return this.citasService.findCitasDeHoy();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

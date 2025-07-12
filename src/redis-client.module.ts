@@ -5,11 +5,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [
     ClientsModule.register([
       {
-        name: 'REDIS_EMITER',
-        transport: Transport.REDIS,
+        name: 'TCP_CLIENT',
+        transport: Transport.TCP,
         options: {
-            host: '127.0.0.1',
-            port: 6379,
+          host: '127.0.0.1',
+          port: 3001,
         },
       },
     ]),

@@ -27,6 +27,16 @@ export class HistoriasController {
   //   return this.historiasService.update(+id, updateHistoriaDto);
   // }
 
+  @Patch('updateAntecedentes/:id')
+  update(@Param('id') id: string, @Body() updateHistoriaDto: UpdateHistoriaDto) {
+    return this.historiasService.updateAntecedentes(+id, updateHistoriaDto);
+  }
+
+  @Get('paciente')
+  listPaciente(@Param('id') id: string) {
+    return this.historiasService.listPaciente();
+  }
+
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.historiasService.remove(+id);

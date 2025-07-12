@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreatePacienteDto } from './dto/create-paciente.dto';
 import { UpdatePacienteDto } from './dto/update-paciente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,15 +8,18 @@ import { HistoriasService } from 'src/historias/historias.service';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class PacientesService {
+export class PacientesService implements OnModuleInit {
   constructor(
     private readonly historiaService:HistoriasService,
-    @Inject('REDIS_EMITER') private client:ClientProxy,
+    @Inject('TCP_CLIENT') private client:ClientProxy,
 
     @InjectRepository(Paciente)
     private pacienteRepo:Repository<Paciente>
   ){
-    
+  }
+  async onModuleInit() {
+    console.log('🚀 PacienteService iniciado, contando pacientes...');
+    await this.countPacientes();
   }
 
   emitirEvento() {
@@ -25,7 +28,7 @@ export class PacientesService {
 
 
   async create(createPacienteDto: CreatePacienteDto) {
-      const newPaciente=this.pacienteRepo.create(createPacienteDto)
+    const newPaciente=this.pacienteRepo.create(createPacienteDto)
     const {id}=await this.pacienteRepo.save(newPaciente)
     const response=await this.historiaService.create(id)
     await this.countPacientes()

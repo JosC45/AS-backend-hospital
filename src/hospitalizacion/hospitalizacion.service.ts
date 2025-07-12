@@ -8,6 +8,7 @@ import { darAltaDto } from './dto/dar-alta.dto';
 import { TriagesService } from 'src/triages/triages.service';
 import { ConsultasService } from 'src/consultas/consultas.service';
 import { PacientesService } from 'src/pacientes/pacientes.service';
+import { Camas, ESTADO_CAMA } from './entities/camas.entity';
 
 @Injectable()
 export class HospitalizacionService {
@@ -15,6 +16,9 @@ export class HospitalizacionService {
     private readonly triageService:TriagesService,
     private readonly consultaService:ConsultasService,
     private readonly pacienteService:PacientesService,
+
+    @InjectRepository(Camas)
+    private camaRepo:Repository<Camas>,
 
     @InjectRepository(Hospitalizacion)
     private hospitalizacionRepo:Repository<Hospitalizacion>
@@ -24,6 +28,26 @@ export class HospitalizacionService {
     const newHospitalizacion=this.hospitalizacionRepo.create({...bodyHospitalizacion,medico:{id:id_medico},cama:{id:id_cama}})
     await this.hospitalizacionRepo.save(newHospitalizacion)
     return 'Se añadio una nueva hospitalizacion';
+  }
+
+  async getCantidadCamasPorEstado() {
+    const totalDisponibles = await this.camaRepo.count({
+      where: { estado: ESTADO_CAMA.DISPONIBLE },
+    });
+  
+    const totalOcupadas = await this.camaRepo.count({
+      where: { estado: ESTADO_CAMA.OCUPADA },
+    });
+  
+    const totalMantenimiento = await this.camaRepo.count({
+      where: { estado: ESTADO_CAMA.MANTENIMIENTO },
+    });
+  
+    return {
+      disponibles: totalDisponibles,
+      ocupadas: totalOcupadas,
+      mantenimiento: totalMantenimiento,
+    };
   }
 
   async findAll() {

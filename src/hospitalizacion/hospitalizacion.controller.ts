@@ -48,4 +48,9 @@ export class HospitalizacionController {
   dar_alta(@Param('id') id:number,@Body() body:darAltaDto){
     return this.hospitalizacionService.changeState(+id,body)
   }
+
+  @Get('camas/estadisticas')
+  getCamasPorEstado() {
+    return this.hospitalizacionService.getCantidadCamasPorEstado();
+  }
 }

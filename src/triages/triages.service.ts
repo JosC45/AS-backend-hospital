@@ -87,4 +87,48 @@ export class TriagesService {
     if(deletedTriage.affected===0)throw new NotFoundException("No se elimino ningun registro")
     return `See eleimino el triage con id #${id}`;
   }
+  
+  async getCantidadTriajesUltimos7Dias() {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // inicio del día de hoy
+  
+    const hace6Dias = new Date(hoy);
+    hace6Dias.setDate(hoy.getDate() - 6); // 6 días atrás
+  
+    // Obtener triajes desde hace 6 días hasta hoy
+    const registros = await this.triageRepo
+      .createQueryBuilder('triage')
+      .select("DATE(triage.fecha_creacion)", "fecha")
+      .addSelect("COUNT(*)", "cantidad")
+      .where("triage.fecha_creacion >= :desde", { desde: hace6Dias })
+      .groupBy("DATE(triage.fecha_creacion)")
+      .orderBy("fecha", "ASC")
+      .getRawMany();
+  
+    // Crear estructura fija para los 7 días
+    const resultados: { fecha: string; cantidad: number }[] = [];
+  
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(hace6Dias);
+      fecha.setDate(hace6Dias.getDate() + i);
+  
+      const yyyy = fecha.getFullYear();
+      const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dd = String(fecha.getDate()).padStart(2, '0');
+      const fechaStr = `${yyyy}-${mm}-${dd}`;
+  
+      const encontrado = registros.find(r => {
+        const rFecha = new Date(r.fecha);
+        const rFechaStr = `${rFecha.getFullYear()}-${String(rFecha.getMonth() + 1).padStart(2, '0')}-${String(rFecha.getDate()).padStart(2, '0')}`;
+        return rFechaStr === fechaStr;
+      });
+  
+      resultados.push({
+        fecha: fechaStr,
+        cantidad: encontrado ? parseInt(encontrado.cantidad, 10) : 0,
+      });
+    }
+  
+    return resultados;
+  }
 }

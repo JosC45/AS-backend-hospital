@@ -56,19 +56,49 @@ export class OrdenesService {
     });;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ordene`;
+  async findOne(id: number) {
+    const orden = await this.ordenRepo.findOne({
+      where: { id },
+      relations: ['paciente', 'medicamento'],
+    });
+    if (!orden) throw new NotFoundException('Orden no encontrada');
+    return orden;
   }
 
-  update(id: number, updateOrdeneDto: UpdateOrdeneDto) {
-    return `This action updates a #${id} ordene`;
+  async update(id: number, updateDto: UpdateOrdeneDto) {
+    const orden = await this.ordenRepo.findOne({
+      where: { id },
+      relations: ['medicamento'],
+    });
+
+    if (!orden) throw new NotFoundException('Orden no encontrada');
+
+    // Actualizar campos simples
+    this.ordenRepo.merge(orden, updateDto);
+
+    // Eliminar medicamentos anteriores (si deseas reemplazarlos)
+    if (updateDto.medicamentos) {
+      await this.medicamentoRepo.remove(orden.medicamento);
+      const nuevosMedicamentos = updateDto.medicamentos.map(m =>
+        this.medicamentoRepo.create({ ...m, orden })
+      );
+      await this.medicamentoRepo.save(nuevosMedicamentos);
+    }
+
+    return this.ordenRepo.save(orden);
   }
+
 
   async remove(id: number) {
-    const orden = await this.ordenRepo.findOneBy({ id });
-    if (!orden) {
-      throw new NotFoundException(`Orden con ID ${id} no encontrada`);
-    }
-    await this.ordenRepo.remove(orden);
+    const orden = await this.ordenRepo.findOne({
+      where: { id },
+      relations: ['medicamento'],
+    });
+
+    if (!orden) throw new NotFoundException('Orden no encontrada');
+
+    await this.medicamentoRepo.remove(orden.medicamento); // eliminar medicamentos
+    await this.ordenRepo.remove(orden); // eliminar orden
+    return { message: 'Orden eliminada correctamente' };
   }
 }

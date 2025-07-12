@@ -18,6 +18,12 @@ export class HistoriasService {
     return 'Se agrego la historia clinica';
   }
 
+  async listPaciente(){
+    const listHistorias=await this.historiaRepo.find({relations:['paciente']})
+    if(listHistorias.length===0)throw new NotFoundException("No se encontraron historias para el paciente")
+    return listHistorias; 
+  }
+
   async findAll() {
     const listHistorias=await this.historiaRepo.find({relations:['paciente'],select:['paciente']})
     if(listHistorias.length===0)throw new NotFoundException("No se encontraron historias")
@@ -60,5 +66,11 @@ export class HistoriasService {
   }
 
   return `Se eliminó correctamente la(s) historia(s) clínica(s) del paciente con id: ${id}`;
+  }
+
+  async updateAntecedentes(id:number,body:UpdateHistoriaDto){
+    const updatedHistoria=await this.historiaRepo.update({id},body)
+    if(updatedHistoria.affected===0)throw new BadRequestException("No se actualizo ningun antecedente")
+    return `Se actualizaron los antecedentes de la historia clinica con id: ${id}`;
   }
 }

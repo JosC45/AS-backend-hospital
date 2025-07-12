@@ -17,6 +17,10 @@ export class ConsultasController {
   findAll() {
     return this.consultasService.findAll();
   }
+  @Get('hoy')
+  getConsultasDeHoy() {
+    return this.consultasService.findConsultasDeHoy();
+  }
   
   @Get('listByHistoria/:id')
   findByHistoria(@Param('id') id:string){

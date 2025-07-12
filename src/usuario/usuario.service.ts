@@ -29,6 +29,7 @@ export class UsuarioService {
     await this.usuarioRepo.save(newUsuario)
     return newUsuario 
     }catch(err){
+      console.log(err)
       throw new InternalServerErrorException("Error al crear el usuario")
     }
   }

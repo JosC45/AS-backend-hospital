@@ -28,18 +28,14 @@ export class Historia {
     @Column()
     fecha_creacion:Date;
 
-    // @Column({type:'enum',enum:TIPO_CONSULTA})
-    // tipo_consulta:TIPO_CONSULTA;
+    @Column({nullable:true})
+    antecedentes_natales:string;
 
-    // @Column()
-    // motivo_consulta:string;
+    @Column({nullable:true})
+    antecedentes_personales:string;
 
-    // @Column()
-    // resultado_y_diagnostico:string;
+    @Column({nullable:true})
+    antecedentes_familiares:string;
 
-    // @Column()
-    // comentarios_adicionales:string;
 
-    // @Column()
-    // fecha_creacion:Date;
 }
