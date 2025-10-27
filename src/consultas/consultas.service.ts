@@ -9,7 +9,7 @@ import { ClientProxy } from '@nestjs/microservices';
 @Injectable()
 export class ConsultasService implements OnModuleInit {
   constructor(
-    @Inject('TCP_CLIENT') private client:ClientProxy,
+    @Inject('REDIS_CLIENT') private client:ClientProxy,
 
     @InjectRepository(Consulta)
     private consultaRepo:Repository<Consulta>

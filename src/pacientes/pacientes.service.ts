@@ -11,7 +11,7 @@ import { ClientProxy } from '@nestjs/microservices';
 export class PacientesService implements OnModuleInit {
   constructor(
     private readonly historiaService:HistoriasService,
-    @Inject('TCP_CLIENT') private client:ClientProxy,
+    @Inject('REDIS_CLIENT') private client:ClientProxy,
 
     @InjectRepository(Paciente)
     private pacienteRepo:Repository<Paciente>

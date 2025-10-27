@@ -5,11 +5,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [
     ClientsModule.register([
       {
-        name: 'TCP_CLIENT',
-        transport: Transport.TCP,
+        name: 'REDIS_CLIENT',
+        transport: Transport.REDIS,
         options: {
-          host: '2.tcp.ngrok.io',
-          port: 13527,
+          host: 'localhost',
+          port: 55156,
         },
       },
     ]),
