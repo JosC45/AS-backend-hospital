@@ -11,27 +11,34 @@ export class TriagesService {
     @InjectRepository(Triage)
     private triageRepo:Repository<Triage>
   ){}
+
   async create(createTriageDto: CreateTriageDto) {
     const { id_historia, ...triageData } = createTriageDto;
-    const newTriage=this.triageRepo.create({...triageData,historia:{id:createTriageDto.id_historia},fecha_creacion:new Date()})
-    await this.triageRepo.save(newTriage)
-    return 'Se añadio correctamente el nuevo triage';
+    const newTriage = this.triageRepo.create({
+      ...triageData,
+      historia: { id: id_historia },
+      fecha_creacion: new Date()
+    });
+    return await this.triageRepo.save(newTriage);
   }
 
   async findAll() {
-    const listTriages=await this.triageRepo
-    .createQueryBuilder('tri')
-    .innerJoin('tri.historia','hist')
-    .innerJoinAndSelect('hist.paciente','pac')
-    .select(['pac.nombres AS nombres','pac.apellidos AS apellidos','tri.motivo AS motivo','tri.prioridad AS prioridad','tri.fecha_creacion AS fecha_creacion',
-      'tri.presion_arterial AS presion_arterial','tri.latidos_pm AS latidos_pm','tri.temperatura AS temperatura'])
-    .where('tri.estado=:estado',{estado:'proceso'})
-    .getRawMany()
+    // --- ¡LA SOLUCIÓN DEFINITIVA CON QUERYBUILDER! ---
+    const listTriages = await this.triageRepo
+      .createQueryBuilder('triage') // Alias para la tabla Triage
+      .innerJoinAndSelect('triage.historia', 'historia') // Unimos y seleccionamos la historia
+      .innerJoinAndSelect('historia.paciente', 'paciente') // Unimos y seleccionamos el paciente
+      .where('triage.estado = :estado', { estado: 'proceso' }) // Condición 1: Triage en proceso
+      .andWhere('paciente.deletedAt IS NULL') // Condición 2: El paciente NO debe estar borrado lógicamente
+      .getMany(); // Obtenemos las entidades anidadas correctamente
 
-    if(listTriages.length===0)throw new NotFoundException("No se encontro triages")
+    // El throw por si no se encuentra nada sigue siendo válido
+    if(listTriages.length === 0) throw new NotFoundException("No se encontraron triages en proceso para pacientes activos");
+    
     return listTriages;
   }
 
+  // ... (El resto de tus funciones no necesitan cambios)
   async listOne(id:number){
     const triage=await this.triageRepo.findOne({where:{id},relations:['historia']})
     if(!triage)throw new NotFoundException("No se encontro la consulta con ese id")
@@ -72,20 +79,19 @@ export class TriagesService {
     if (updateTriageDto.id_historia) triage.historia = { id: updateTriageDto.id_historia } as any;
     
     Object.assign(triage, updateTriageDto);
-    await this.triageRepo.save(triage);
-
-    return `Se actualizó correctamente el triage con id: #${id}`;
+    return await this.triageRepo.save(triage);
   }
+
   async finish(id:number){
     const finished=await this.triageRepo.update({id},{estado:'finalizado'})
     if(finished.affected===0) throw new BadRequestException("no se pudo finzliar el triaje fijese el id")
-    return `Se finalizo el triage con id ${id}`
+    return { message: `Se finalizo el triage con id ${id}`, success: true };
   }
 
   async remove(id: number) {
     const deletedTriage=await this.triageRepo.delete({id})
     if(deletedTriage.affected===0)throw new NotFoundException("No se elimino ningun registro")
-    return `See eleimino el triage con id #${id}`;
+    return { message: `Se elimino el triage con id #${id}`, success: true };
   }
   
   async getCantidadTriajesUltimos7Dias() {

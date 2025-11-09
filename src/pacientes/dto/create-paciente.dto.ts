@@ -1,4 +1,4 @@
-import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, IsOptional, IsDate } from "class-validator";
 import { GENERO, SEGURO } from "../entities/paciente.entity";
 
 export class CreatePacienteDto {
@@ -40,4 +40,8 @@ export class CreatePacienteDto {
         @IsString()
         @IsNotEmpty()
         tipo_sangre: string;
+
+        @IsOptional()
+        @IsDate()
+        deletedAt?: Date;
 }

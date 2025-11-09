@@ -1,18 +1,18 @@
 import { Historia } from "src/historias/entities/historia.entity";
 import { Triage } from "src/triages/entities/triage.entity";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
 
 export enum GENERO{
     MASCULINO="masculino",
     FEMENINO="femenino"
 }
+
 export enum SEGURO{
     SIS="Sis",
     ESSALUD="EsSalud",
     EPS="EPS",
     PARTICULAR="Particular"
 }
-
 @Entity()
 export class Paciente {
     @PrimaryGeneratedColumn()
@@ -50,5 +50,8 @@ export class Paciente {
 
     @OneToOne(()=>Historia,{cascade:true})
     @JoinColumn()
-    historia:Historia
+    historia:Historia;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

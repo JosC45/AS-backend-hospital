@@ -31,9 +31,13 @@ export class HistoriasService {
   }
 
   async findOne(id: number) {
-      const oneHistoria=await this.historiaRepo.find({where:{id},relations:['paciente']})
-      if(!oneHistoria)throw new NotFoundException("No se encontro la historia")
-      return oneHistoria
+      const oneHistoria = await this.historiaRepo.findOne({
+          where: { id },
+          relations: ['paciente', 'consulta'] 
+      });
+
+      if(!oneHistoria) throw new NotFoundException("No se encontro la historia");
+      return oneHistoria;
   }
 
   // async update(id: number, updateHistoriaDto: UpdateHistoriaDto) {
@@ -68,9 +72,10 @@ export class HistoriasService {
   return `Se eliminó correctamente la(s) historia(s) clínica(s) del paciente con id: ${id}`;
   }
 
-  async updateAntecedentes(id:number,body:UpdateHistoriaDto){
-    const updatedHistoria=await this.historiaRepo.update({id},body)
-    if(updatedHistoria.affected===0)throw new BadRequestException("No se actualizo ningun antecedente")
-    return `Se actualizaron los antecedentes de la historia clinica con id: ${id}`;
+  async updateAntecedentes(id:number, body:UpdateHistoriaDto){
+    const updatedHistoria = await this.historiaRepo.update({id}, body);
+    if(updatedHistoria.affected === 0) throw new BadRequestException("No se actualizo ningun antecedente");
+    
+    return this.findOne(id);
   }
 }
