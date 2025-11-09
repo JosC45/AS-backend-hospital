@@ -33,7 +33,12 @@ export class HistoriasService {
   async findOne(id: number) {
       const oneHistoria = await this.historiaRepo.findOne({
           where: { id },
-          relations: ['paciente', 'consulta'] 
+          relations: {
+              paciente: true,
+              consulta: {
+                  medico: true
+              },
+          }
       });
 
       if(!oneHistoria) throw new NotFoundException("No se encontro la historia");

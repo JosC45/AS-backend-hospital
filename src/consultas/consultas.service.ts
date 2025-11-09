@@ -21,11 +21,22 @@ export class ConsultasService implements OnModuleInit {
   }
 
   async create(createConsultaDto: CreateConsultaDto) {
-    const {id_historia,id_medico,...bodyConsulta}=createConsultaDto
-    const newConsulta=this.consultaRepo.create({...bodyConsulta,historia:{id:id_historia},medico:{id:id_medico},fecha_creacion:new Date(),estado:'proceso'})
-    await this.consultaRepo.save(newConsulta)
+    const { id_historia, id_medico, ...bodyConsulta } = createConsultaDto;
+    const newConsulta = this.consultaRepo.create({
+      ...bodyConsulta,
+      historia: { id: id_historia },
+      medico: { id: id_medico },
+      fecha_creacion: new Date(),
+      estado: 'proceso'
+    });
+
+    const savedConsulta = await this.consultaRepo.save(newConsulta);
     await this.counConsultasHoy();
-    return 'Se añadio correctamente la consulta';
+    
+    return this.consultaRepo.findOne({
+      where: { id: savedConsulta.id },
+      relations: ['medico', 'historia']
+    });
   }
 
   async findConsultasDeHoy(): Promise<Consulta[]> {
@@ -59,9 +70,12 @@ export class ConsultasService implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    const consulta=await this.consultaRepo.findOne({where:{id},relations:['historia']})
-    if(!consulta)throw new NotFoundException("No se encontro la consulta con ese id")
-    return consulta
+    const consulta=await this.consultaRepo.findOne({
+      where:{id},
+      relations:['historia', 'medico']
+    });
+    if(!consulta)throw new NotFoundException("No se encontro la consulta con ese id");
+    return consulta;
   }
 
   async listByHistoria(id:number){
@@ -72,7 +86,7 @@ export class ConsultasService implements OnModuleInit {
 
   async update(id: number, updateConsultaDto: UpdateConsultaDto) {
     const consulta = await this.consultaRepo.findOne({ where: { id } });
-    if (!consulta ) throw new NotFoundException(`Triage con id ${id} no encontrado`);
+    if (!consulta ) throw new NotFoundException(`Consulta con id ${id} no encontrada`);
 
     if (updateConsultaDto.id_historia) consulta.historia = { id: updateConsultaDto.id_historia } as any;
     if(updateConsultaDto.id_medico) consulta.medico={id:updateConsultaDto.id_medico} as any;
@@ -80,17 +94,19 @@ export class ConsultasService implements OnModuleInit {
     Object.assign(consulta , updateConsultaDto);
     await this.consultaRepo.save(consulta);
 
-    return `Se actualizó correctamente la consulta con id: #${id}`;
+    // Devolvemos la entidad completa y actualizada
+    return this.findOne(id);
   }
 
   async finish(id:number){
-    const finished=await this.consultaRepo.update({id},{estado:'finalizado'})
-    if(finished.affected===0)throw new BadRequestException("No se cambio ningun valor")
-    return `Se finalizo correctamente la consulta con id ${id}`
+    const finished=await this.consultaRepo.update({id},{estado:'finalizado'});
+    if(finished.affected===0) throw new BadRequestException("No se pudo finalizar la consulta");
+    return { message: `Se finalizó correctamente la consulta con id ${id}`, success: true };
   }
+  
   async remove(id: number) {
-    const deleteConsulta=await this.consultaRepo.delete({id})
-    if(deleteConsulta.affected===0)throw new BadRequestException("No se elimino ningun paciente")
-    return `Se elimino el paciente con id: ${id}`;
+    const deleteConsulta=await this.consultaRepo.delete({id});
+    if(deleteConsulta.affected===0) throw new BadRequestException("No se eliminó ninguna consulta");
+    return { message: `Se eliminó la consulta con id: ${id}`, success: true };
   }
 }
