@@ -1,4 +1,7 @@
-    import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Medico } from "src/medicos/entities/medico.entity";
+import { Personal } from "src/personal/entities/personal.entity";
+import { Admin } from "src/admin/entities/admin.entity";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
     export enum ESTADO_USUARIO{
         ACTIVO="activo",
@@ -26,4 +29,13 @@
 
         @Column()
         estado:ESTADO_USUARIO;
+
+        @OneToOne(() => Medico, (medico) => medico.usuario)
+        medico: Medico;
+
+        @OneToOne(() => Admin, (admin) => admin.usuario)
+        admin: Admin;
+
+        @OneToOne(() => Personal, (personal) => personal.usuario)
+        personal: Personal;
     }

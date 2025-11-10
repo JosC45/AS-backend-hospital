@@ -25,7 +25,10 @@ export class Personal {
     @Column({type:'enum',enum:Tipo_Personal})
     tipo:Tipo_Personal;
 
-    @OneToOne(()=>Usuario,{cascade:true})
-    @JoinColumn()
-    usuario:Usuario;
+    @Column({ name: 'usuarioId', nullable: true })
+    usuarioId: number;
+
+    @OneToOne(() => Usuario, (usuario) => usuario.personal)
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: Usuario;
 }

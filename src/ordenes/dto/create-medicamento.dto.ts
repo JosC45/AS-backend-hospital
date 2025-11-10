@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateMedicamentoDto{
+export class CreateMedicamentoDto {
     @IsString()
     @IsNotEmpty()
     nombre: string;
@@ -9,9 +9,9 @@ export class CreateMedicamentoDto{
     @IsNotEmpty()
     presentacion: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    dosis: number;
+    dosis: string;
 
     @IsString()
     @IsNotEmpty()
@@ -24,8 +24,4 @@ export class CreateMedicamentoDto{
     @IsString()
     @IsNotEmpty()
     duracion: string;
-
-    @IsNumber()
-    @IsNotEmpty()
-    id_orden: number;
 }

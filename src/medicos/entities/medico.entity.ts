@@ -30,8 +30,10 @@ export class Medico {
     @Column({nullable:true})
     especialidad:string;
 
-    @OneToOne(()=>Usuario,{cascade:true})
-    @JoinColumn()
-    usuario:Usuario;
+    @Column({ name: 'usuarioId', nullable: true })
+    usuarioId: number;
 
+    @OneToOne(() => Usuario, (usuario) => usuario.medico)
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: Usuario;
 }

@@ -1,24 +1,26 @@
-import { Usuario } from "src/usuario/entities/usuario.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Usuario } from 'src/usuario/entities/usuario.entity';
 @Entity()
 export class Admin {
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number;
 
     @Column()
-    nombres:string;
+    nombres: string;
 
     @Column()
-    apellidos:string;
+    apellidos: string;
 
     @Column()
-    correo:string;
+    correo: string;
 
     @Column()
-    dni:string;
+    dni: string;
 
-    @OneToOne(()=>Usuario,{cascade:true})
-    @JoinColumn()
-    usuario:Usuario;
+    @Column({ name: 'usuarioId', nullable: true })
+    usuarioId: number;
+
+    @OneToOne(() => Usuario, (usuario) => usuario.admin)
+    @JoinColumn({ name: 'usuarioId' })
+    usuario: Usuario;
 }

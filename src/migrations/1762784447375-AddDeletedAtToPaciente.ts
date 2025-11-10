@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitialSchema1762721066334 implements MigrationInterface {
-    name = 'InitialSchema1762721066334'
+export class AddDeletedAtToPaciente1762784447375 implements MigrationInterface {
+    name = 'AddDeletedAtToPaciente1762784447375'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`usuario\` (\`id\` int NOT NULL AUTO_INCREMENT, \`username\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL, \`rol\` varchar(255) NOT NULL, \`estado\` varchar(255) NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -16,7 +16,7 @@ export class InitialSchema1762721066334 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`camas\` (\`id\` int NOT NULL AUTO_INCREMENT, \`piso\` varchar(255) NOT NULL, \`cama\` varchar(255) NOT NULL, \`estado\` enum ('disponible', 'ocupada', 'mantenimiento') NOT NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`nota\` (\`id\` int NOT NULL AUTO_INCREMENT, \`descripcion\` varchar(255) NOT NULL, \`fecha_creacion\` datetime NOT NULL, \`id_hospitalizacion\` int NULL, \`id_medico\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`orden\` (\`id\` int NOT NULL AUTO_INCREMENT, \`lugar_emision\` varchar(255) NOT NULL, \`diagnostico_principal\` varchar(255) NOT NULL, \`indicaciones_terapeuticas\` varchar(255) NOT NULL, \`fecha_creacion\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, \`id_paciente\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`medicamento\` (\`id\` int NOT NULL AUTO_INCREMENT, \`nombre\` varchar(255) NOT NULL, \`presentacion\` varchar(255) NOT NULL, \`dosis\` int NOT NULL, \`via_administracion\` varchar(255) NOT NULL, \`frecuencia\` varchar(255) NOT NULL, \`duracion\` varchar(255) NOT NULL, \`id_orden\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`medicamento\` (\`id\` int NOT NULL AUTO_INCREMENT, \`nombre\` varchar(255) NOT NULL, \`presentacion\` varchar(255) NOT NULL, \`dosis\` varchar(255) NOT NULL, \`via_administracion\` varchar(255) NOT NULL, \`frecuencia\` varchar(255) NOT NULL, \`duracion\` varchar(255) NOT NULL, \`id_orden\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`personal\` (\`id\` int NOT NULL AUTO_INCREMENT, \`nombres\` varchar(255) NOT NULL, \`apellidos\` varchar(255) NOT NULL, \`correo\` varchar(255) NOT NULL, \`dni\` varchar(255) NOT NULL, \`tipo\` enum ('secretaria', 'cajera') NOT NULL, \`usuarioId\` int NULL, UNIQUE INDEX \`REL_7c9f9239a8132547837f6fdf48\` (\`usuarioId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`admin\` ADD CONSTRAINT \`FK_d6655cf5853701ab8ac2d7d4d35\` FOREIGN KEY (\`usuarioId\`) REFERENCES \`usuario\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`medico\` ADD CONSTRAINT \`FK_aec4c649fc7271a07188203310d\` FOREIGN KEY (\`usuarioId\`) REFERENCES \`usuario\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);

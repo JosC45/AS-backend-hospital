@@ -13,7 +13,7 @@ export class Medicamento{
     presentacion:string;
 
     @Column()
-    dosis:number;
+    dosis: string;
 
     @Column()
     via_administracion:string;
