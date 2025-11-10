@@ -4,11 +4,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [
-      {
-        "include": "migrations/*.js",
-        "outDir": "dist/migrations"
-      }
-    ]
+    "assets": ["migrations/**"],
+    "watchAssets": true
   }
 }
