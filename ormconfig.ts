@@ -1,15 +1,10 @@
+
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnvVars = [
-    'DB_HOST',
-    'DB_PORT',
-    'DB_USER',
-    'DB_PASSWORD',
-    'DB_NAME'
-];
+const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 
 for (const varName of requiredEnvVars) {
     if (!process.env[varName]) {
@@ -27,6 +22,7 @@ export default new DataSource({
     entities: [__dirname + '/**/*.entity{.ts,.js}'],
     synchronize: false,
     migrations: [__dirname + '/migrations/*{.ts,.js}'],
+    
     ssl: true, 
     extra: {
         ssl: {
