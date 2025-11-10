@@ -21,7 +21,8 @@
       "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ormconfig.ts",
       "migration:generate": "npm run typeorm migration:generate --",
       "migration:run": "npm run typeorm migration:run",
-      "migration:revert": "npm run typeorm migration:revert"
+      "migration:revert": "npm run typeorm migration:revert",
+      "debug:env": "node -e \"console.log('--- VARIABLES DE ENTORNO ---'); console.log({ host: process.env.DB_HOST, port: process.env.DB_PORT, user: process.env.DB_USER, pass: process.env.DB_PASSWORD, name: process.env.DB_NAME }); console.log('--- FIN DE VARIABLES ---');\""
     },
     "dependencies": {
       "@nestjs/common": "^11.0.1",
