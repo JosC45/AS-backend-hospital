@@ -24,12 +24,30 @@ export class HospitalizacionService {
     private hospitalizacionRepo:Repository<Hospitalizacion>
   ){}
   async create(createHospitalizacionDto: CreateHospitalizacionDto) {
-    const {id_medico,id_cama,...bodyHospitalizacion}=createHospitalizacionDto
-    const newHospitalizacion=this.hospitalizacionRepo.create({...bodyHospitalizacion,medico:{id:id_medico},cama:{id:id_cama}})
-    await this.hospitalizacionRepo.save(newHospitalizacion)
-    return 'Se añadio una nueva hospitalizacion';
-  }
+    const { id_cama, id_medico, ...bodyHospitalizacion } = createHospitalizacionDto;
 
+    const cama = await this.camaRepo.findOneBy({ id: id_cama });
+    if (!cama) {
+      throw new NotFoundException(`La cama con ID ${id_cama} no existe.`);
+    }
+
+    if (cama.estado !== ESTADO_CAMA.DISPONIBLE) {
+      throw new BadRequestException(`La cama ${cama.cama} no está disponible. Estado actual: ${cama.estado}`);
+    }
+
+    cama.estado = ESTADO_CAMA.OCUPADA;
+
+    const newHospitalizacion = this.hospitalizacionRepo.create({
+      ...bodyHospitalizacion,
+      medico: { id: id_medico },
+      cama: cama,
+    });
+
+    await this.camaRepo.save(cama);
+    await this.hospitalizacionRepo.save(newHospitalizacion);
+
+    return {message: 'Se añadió una nueva hospitalización y la cama fue marcada como ocupada.'};
+  }
   async getCantidadCamasPorEstado() {
     const totalDisponibles = await this.camaRepo.count({
       where: { estado: ESTADO_CAMA.DISPONIBLE },
@@ -119,6 +137,58 @@ export class HospitalizacionService {
         }))
 
         return alta
+  }
+
+  async findAllActive() {
+    const listHospitalizacion = await this.hospitalizacionRepo.find({
+      where: { estado: Estado_Hospitalizacion.HOSPITALIZADO },
+      relations: ['cama', 'medico'],
+    });
+
+    if (listHospitalizacion.length === 0) {
+      return [];
+    }
+    
+    const hospitalizaciones = Promise.all(
+      listHospitalizacion.map(async (hospit) => {
+        let historiaId;
+        if (hospit.intervencion === INTERVENCION.CONSULTA) {
+          const object_intervencion = await this.consultaService.findOne(hospit.id_intervencion);
+          historiaId = object_intervencion.historia.id;
+        }
+        if (hospit.intervencion === INTERVENCION.TRIAJE) {
+          const object_intervencion = await this.triageService.listOne(hospit.id_intervencion);
+          historiaId = object_intervencion.historia.id;
+        }
+
+        const paciente = await this.pacienteService.findPacienteByHistoria(historiaId);
+
+        return {
+          id: hospit.id,
+          paciente: paciente,
+          diagnosticoIngreso: hospit.diagnostico_ingreso,
+          medicoTratante: `${hospit.medico.nombres} ${hospit.medico.apellidos}`,
+          fechaIngreso: hospit.fecha_ingreso,
+          cama: hospit.cama.cama,
+          area: hospit.area_destino,
+          estado: hospit.estado,
+          diagnostico_alta: hospit.diagnostico_alta,
+          diagnostico_secundario: hospit.diagnostico_secundario,
+          tratamiento_realizado: hospit.tratamiento_realizado,
+          recomendaciones_hogar: hospit.recomendaciones_hogar,
+          pronostico: hospit.pronostico,
+          fecha_salida: hospit.fecha_salida
+        };
+      }),
+    );
+    return hospitalizaciones;
+  }
+
+  async findCamasDisponibles(): Promise<Camas[]> {
+    return this.camaRepo.find({
+      where: { estado: ESTADO_CAMA.DISPONIBLE },
+      order: { piso: 'ASC', cama: 'ASC' },
+    });
   }
 
   async update(id: number, updateHospitalizacionDto: UpdateHospitalizacionDto) {

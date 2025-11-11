@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateHistoriaDto } from './dto/create-historia.dto';
+import { Hospitalizacion, Estado_Hospitalizacion, INTERVENCION } from 'src/hospitalizacion/entities/hospitalizacion.entity';
 import { UpdateHistoriaDto } from './dto/update-historia.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Historia } from './entities/historia.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class HistoriasService {
   constructor(
     @InjectRepository(Historia)
-    private historiaRepo:Repository<Historia>
-  ){}
+    private readonly historiaRepo: Repository<Historia>,
+    @InjectRepository(Hospitalizacion)
+    private readonly hospitalizacionRepo: Repository<Hospitalizacion>,
+  ) {}
 
   async create(id:number) {
     const newHistoria=this.historiaRepo.create({paciente:{id},fecha_creacion:new Date()})
@@ -31,18 +33,27 @@ export class HistoriasService {
   }
 
   async findOne(id: number) {
-      const oneHistoria = await this.historiaRepo.findOne({
-          where: { id },
-          relations: {
-              paciente: true,
-              consulta: {
-                  medico: true
-              },
-          }
-      });
+    const historia = await this.historiaRepo.findOne({
+      where: { id },
+      relations: ['paciente', 'consulta', 'consulta.medico'],
+    });
 
-      if(!oneHistoria) throw new NotFoundException("No se encontro la historia");
-      return oneHistoria;
+    if (!historia) throw new NotFoundException('Historia no encontrada');
+
+    const consultaIds = historia.consulta.map(c => c.id);
+    let estaHospitalizado = false;
+    if (consultaIds.length > 0) {
+      const hospitalizacionActiva = await this.hospitalizacionRepo.findOne({
+        where: {
+          id_intervencion: In(consultaIds),
+          intervencion: INTERVENCION.CONSULTA,
+          estado: Estado_Hospitalizacion.HOSPITALIZADO,
+        },
+      });
+      estaHospitalizado = !!hospitalizacionActiva;
+    }
+
+    return { ...historia, estaHospitalizado };
   }
 
   // async update(id: number, updateHistoriaDto: UpdateHistoriaDto) {

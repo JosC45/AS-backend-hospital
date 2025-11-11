@@ -74,6 +74,19 @@ export class PacientesService implements OnModuleInit {
     return nombre;
   }
 
+  async findPacienteByHistoria(historiaId: number): Promise<Paciente> {
+    const paciente = await this.pacienteRepo.findOne({
+      where: { historia: { id: historiaId } },
+      relations: ['historia'],
+    });
+
+    if (!paciente) {
+      throw new NotFoundException(`No se encontró un paciente asociado a la historia con ID ${historiaId}`);
+    }
+
+    return paciente;
+  }
+
   async update(id: number, updatePacienteDto: UpdatePacienteDto) {
     const updateResult = await this.pacienteRepo.update({ id }, { ...updatePacienteDto });
     if (updateResult.affected === 0) throw new BadRequestException("Paciente no encontrado para actualizar");

@@ -34,6 +34,16 @@ export class HospitalizacionController {
     return this.hospitalizacionService.findByArea(area)
   }
 
+  @Get('activos')
+  findAllActive() {
+    return this.hospitalizacionService.findAllActive();
+  }
+
+  @Get('camas-disponibles')
+  findCamasDisponibles() {
+    return this.hospitalizacionService.findCamasDisponibles();
+  }
+
   @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateHospitalizacionDto: UpdateHospitalizacionDto) {
     return this.hospitalizacionService.update(+id, updateHospitalizacionDto);
