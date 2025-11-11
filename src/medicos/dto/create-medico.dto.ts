@@ -27,7 +27,7 @@ export class CreateMedicoDto {
     @IsString()
     especialidad?: string;
 
-    // @ValidateNested()
-    // @Type(() => CreateUsuarioDto)
-    // usuario: CreateUsuarioDto;
+    @ValidateNested()
+    @Type(() => CreateUsuarioDto)
+    usuario: CreateUsuarioDto;
 }
