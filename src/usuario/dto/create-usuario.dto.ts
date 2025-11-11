@@ -1,5 +1,5 @@
 import { IsEnum,  IsNotEmpty, IsString } from "class-validator";
-import {  ROLES_USUARIO } from "../entities/usuario.entity";
+import {  ROLES_USUARIO, ESTADO_USUARIO } from "../entities/usuario.entity";
 
 export class CreateUsuarioDto {
     @IsString()
@@ -13,6 +13,6 @@ export class CreateUsuarioDto {
     @IsEnum(ROLES_USUARIO)
     rol: ROLES_USUARIO;
 
-    // @IsEnum(ESTADO_USUARIO)
-    // estado: ESTADO_USUARIO;
+    @IsEnum(ESTADO_USUARIO)
+    estado: ESTADO_USUARIO;
 }
