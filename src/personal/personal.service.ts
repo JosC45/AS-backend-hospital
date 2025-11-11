@@ -17,13 +17,21 @@ export class PersonalService {
   ){}
 
   async create(createPersonalDto: CreatePersonalDto) {
-    const {nombres,apellidos,tipo,...bodyUsuario}=createPersonalDto
+    const { usuario, ...personalProfileData } = createPersonalDto;
 
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.PERSONAL, estado: ESTADO_USUARIO.ACTIVO})
+    const newUser = await this.usuarioService.createUserByRol({
+      username: usuario.username,
+      password: usuario.password,
+      rol: usuario.rol,
+      estado: usuario.estado
+    });
 
-    const newPersonal=this.personalRepo.create({...createPersonalDto,usuario:{id}})
+    const newPersonal = this.personalRepo.create({
+      ...personalProfileData,
+      usuario: newUser
+    });
 
-    await this.personalRepo.save(newPersonal)
+    await this.personalRepo.save(newPersonal);
 
     return 'El personal fue creado satisfactoriamente con su usuario';
   }

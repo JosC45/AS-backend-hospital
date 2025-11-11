@@ -5,7 +5,6 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Admin } from './entities/admin.entity';
 import { Repository } from 'typeorm';
-import { ROLES_USUARIO, ESTADO_USUARIO } from 'src/usuario/entities/usuario.entity';
 
 @Injectable()
 export class AdminService {
@@ -16,13 +15,21 @@ export class AdminService {
     private adminRepo:Repository<Admin>
   ){}
   async create(createAdminDto: CreateAdminDto) {
-    const {nombres,apellidos,...bodyUsuario}=createAdminDto
-        
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.ADMIN, estado: ESTADO_USUARIO.ACTIVO})
+    const { usuario, ...adminProfileData } = createAdminDto;
 
-    const newMedico=this.adminRepo.create({...createAdminDto,usuario:{id}})
+    const newUser = await this.usuarioService.createUserByRol({
+      username: usuario.username,
+      password: usuario.password,
+      rol: usuario.rol,
+      estado: usuario.estado
+    });
 
-    await this.adminRepo.save(newMedico)
+    const newAdmin = this.adminRepo.create({
+      ...adminProfileData,
+      usuario: newUser
+    });
+
+    await this.adminRepo.save(newAdmin);
 
     return 'El admin fue creado satisfactoriamente con su usuario';
   }

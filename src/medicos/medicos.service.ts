@@ -25,14 +25,22 @@ export class MedicosService  implements OnModuleInit{
   }
 
   async create(createMedicoDto: CreateMedicoDto) {
-    const {nombres,apellidos,tipo,...bodyUsuario}=createMedicoDto
-    
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.MEDICO, estado: ESTADO_USUARIO.ACTIVO})
+    const { usuario, ...medicoProfileData } = createMedicoDto;
 
-    const newMedico=this.medicoRepo.create({...createMedicoDto,usuario:{id}})
+    const newUser = await this.usuarioService.createUserByRol({
+      username: usuario.username,
+      password: usuario.password,
+      rol: usuario.rol,
+      estado: usuario.estado
+    });
 
-    await this.medicoRepo.save(newMedico)
-    await this.countMedicos() 
+    const newMedico = this.medicoRepo.create({
+      ...medicoProfileData,
+      usuario: newUser
+    });
+
+    await this.medicoRepo.save(newMedico);
+    await this.countMedicos();
     return 'El medico fue creado satisfactoriamente con su usuario';
   }
 
