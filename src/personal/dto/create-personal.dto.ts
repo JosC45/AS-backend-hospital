@@ -1,5 +1,7 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { Tipo_Personal } from "../entities/personal.entity";
+import { Type } from "class-transformer";
+import { CreateUsuarioDto } from "src/usuario/dto/create-usuario.dto";
 
 export class CreatePersonalDto {
     @IsString()
@@ -21,7 +23,8 @@ export class CreatePersonalDto {
     @IsEnum(Tipo_Personal)
     tipo: Tipo_Personal;
 
-    // @ValidateNested()
-    // @Type(() => CreateUsuarioDto)
-    // usuario: CreateUsuarioDto;
+    @ValidateNested()
+    @Type(() => CreateUsuarioDto)
+    @IsNotEmpty()
+    usuario: CreateUsuarioDto;
 }

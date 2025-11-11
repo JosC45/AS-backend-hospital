@@ -25,7 +25,7 @@ export class PersonalService {
       rol: usuario.rol,
       estado: usuario.estado
     });
-
+yyy
     const newPersonal = this.personalRepo.create({
       ...personalProfileData,
       usuario: newUser
