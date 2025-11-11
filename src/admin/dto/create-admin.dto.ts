@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { CreateUsuarioDto } from 'src/usuario/dto/create-usuario.dto';
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
