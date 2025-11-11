@@ -1,3 +1,4 @@
+import { CreateUsuarioDto } from 'src/usuario/dto/create-usuario.dto';
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateAdminDto {
@@ -17,7 +18,7 @@ export class CreateAdminDto {
     @IsNotEmpty()
     dni: string;
 
-    // @ValidateNested()
-    // @Type(() => CreateUsuarioDto)
-    // usuario: CreateUsuarioDto;
+    @ValidateNested()
+    @Type(() => CreateUsuarioDto)
+    usuario: CreateUsuarioDto;
 }
