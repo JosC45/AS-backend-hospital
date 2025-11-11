@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Personal } from './entities/personal.entity';
 import { Repository } from 'typeorm';
 import { UsuarioService } from 'src/usuario/usuario.service';
-import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { ESTADO_USUARIO, ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
 
 @Injectable()
 export class PersonalService {
@@ -19,7 +19,7 @@ export class PersonalService {
   async create(createPersonalDto: CreatePersonalDto) {
     const {nombres,apellidos,tipo,...bodyUsuario}=createPersonalDto
 
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.PERSONAL})
+    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.PERSONAL, estado: ESTADO_USUARIO.ACTIVO})
 
     const newPersonal=this.personalRepo.create({...createPersonalDto,usuario:{id}})
 

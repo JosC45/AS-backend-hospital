@@ -5,7 +5,7 @@ import { UsuarioService } from 'src/usuario/usuario.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medico } from './entities/medico.entity';
 import { Repository } from 'typeorm';
-import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { ESTADO_USUARIO, ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class MedicosService  implements OnModuleInit{
   async create(createMedicoDto: CreateMedicoDto) {
     const {nombres,apellidos,tipo,...bodyUsuario}=createMedicoDto
     
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.MEDICO, })
+    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.MEDICO, estado: ESTADO_USUARIO.ACTIVO})
 
     const newMedico=this.medicoRepo.create({...createMedicoDto,usuario:{id}})
 
