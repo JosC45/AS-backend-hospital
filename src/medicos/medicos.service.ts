@@ -27,7 +27,7 @@ export class MedicosService  implements OnModuleInit{
   async create(createMedicoDto: CreateMedicoDto) {
     const {nombres,apellidos,tipo,...bodyUsuario}=createMedicoDto
     
-    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.MEDICO})
+    const {id}=await this.usuarioService.createUserByRol({username:bodyUsuario.correo,password:bodyUsuario.dni,rol:ROLES_USUARIO.MEDICO, })
 
     const newMedico=this.medicoRepo.create({...createMedicoDto,usuario:{id}})
 
