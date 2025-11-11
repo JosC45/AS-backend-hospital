@@ -13,8 +13,6 @@ export class UsuarioService {
     private readonly usuarioRepo: Repository<Usuario>,
   ) { }
 
-  // ... (métodos create, createUserByRol, findAll no cambian) ...
-
   async create(createUsuarioDto: CreateUsuarioDto) {
     const { password, ...userData } = createUsuarioDto;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,12 +37,9 @@ export class UsuarioService {
     return this.usuarioRepo.find();
   }
 
-  // --- MÉTODO CORREGIDO ---
   async findOne(id: number) {
-    // Cambiamos findOneBy por findOne para poder usar la opción 'relations'
     const user = await this.usuarioRepo.findOne({
       where: { id },
-      // Le decimos a TypeORM que cargue también los datos de estas entidades relacionadas
       relations: ['medico', 'admin', 'personal'],
     });
 
@@ -52,14 +47,11 @@ export class UsuarioService {
       throw new NotFoundException(`Usuario con ID #${id} no encontrado`);
     }
 
-    // Devolvemos el usuario completo (con sus relaciones) pero sin la contraseña
     const { password, ...result } = user;
     return result;
   }
 
   async findOneByUsername(username: string) {
-    // Opcional: si también necesitas los perfiles al hacer login,
-    // deberías aplicar la misma lógica de 'relations' aquí.
     return this.usuarioRepo.findOneBy({ username });
   }
 
@@ -68,11 +60,11 @@ export class UsuarioService {
       updateUsuarioDto.password = await bcrypt.hash(updateUsuarioDto.password, 10);
     }
     await this.usuarioRepo.update(id, updateUsuarioDto);
-    return this.findOne(id); // findOne ahora devolverá el perfil completo
+    return this.findOne(id);
   }
 
   async remove(id: number) {
-    const user = await this.findOne(id); // Primero busca para asegurar que existe
+    const user = await this.findOne(id);
     await this.usuarioRepo.delete(id);
     return { message: `Usuario con ID #${id} eliminado.` };
   }
