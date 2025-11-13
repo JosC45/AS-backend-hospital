@@ -1,57 +1,65 @@
+// src/pacientes/entities/paciente.entity.ts
+
 import { Historia } from "src/historias/entities/historia.entity";
 import { Triage } from "src/triages/entities/triage.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
+// CAMBIO: Importamos la entidad Hospitalizacion
+import { Hospitalizacion } from "src/hospitalizacion/entities/hospitalizacion.entity";
 
-export enum GENERO{
-    MASCULINO="masculino",
-    FEMENINO="femenino"
+export enum GENERO {
+    MASCULINO = "masculino",
+    FEMENINO = "femenino"
 }
 
-export enum SEGURO{
-    SIS="Sis",
-    ESSALUD="EsSalud",
-    EPS="EPS",
-    PARTICULAR="Particular"
+export enum SEGURO {
+    SIS = "Sis",
+    ESSALUD = "EsSalud",
+    EPS = "EPS",
+    PARTICULAR = "Particular"
 }
-@Entity()
+
+@Entity('paciente') // Es buena práctica nombrar la tabla en plural
 export class Paciente {
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number;
 
     @Column()
-    nombres:string;
-    
-    @Column()
-    apellidos:string;
+    nombres: string;
 
     @Column()
-    dni:number;
-    
-    @Column()
-    fecha_nacimiento:Date;
-    
-    @Column()
-    correo:string;
+    apellidos: string;
 
     @Column()
-    numero:string;
+    dni: number;
 
     @Column()
-    domicilio:string;
-
-    @Column({type:"enum",enum:GENERO})
-    genero:GENERO;
-
-    @Column({type:"enum",enum:SEGURO})
-    seguro:SEGURO;
+    fecha_nacimiento: Date;
 
     @Column()
-    tipo_sangre:string;
+    correo: string;
 
-    @OneToOne(()=>Historia,{cascade:true})
+    @Column()
+    numero: string;
+
+    @Column()
+    domicilio: string;
+
+    @Column({ type: "enum", enum: GENERO })
+    genero: GENERO;
+
+    @Column({ type: "enum", enum: SEGURO })
+    seguro: SEGURO;
+
+    @Column()
+    tipo_sangre: string;
+
+    @OneToOne(() => Historia, { cascade: true })
     @JoinColumn()
-    historia:Historia;
+    historia: Historia;
 
     @DeleteDateColumn()
     deletedAt: Date;
+
+    @OneToMany(() => Hospitalizacion, (hospitalizacion) => hospitalizacion.paciente)
+    hospitalizaciones: Hospitalizacion[];
 }

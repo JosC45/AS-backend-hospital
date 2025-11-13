@@ -23,31 +23,52 @@ export class HospitalizacionService {
     @InjectRepository(Hospitalizacion)
     private hospitalizacionRepo:Repository<Hospitalizacion>
   ){}
+
   async create(createHospitalizacionDto: CreateHospitalizacionDto) {
-    const { id_cama, id_medico, ...bodyHospitalizacion } = createHospitalizacionDto;
+    const { id_cama, id_medico, intervencion, id_intervencion, ...bodyHospitalizacion } = createHospitalizacionDto;
+
+    let pacienteId: number;
+    if (intervencion === INTERVENCION.CONSULTA) {
+      const consulta = await this.consultaService.findOne(id_intervencion);
+      if (!consulta || !consulta.historia) throw new NotFoundException('Consulta o historia no encontrada');
+      const paciente = await this.pacienteService.findPacienteByHistoria(consulta.historia.id);
+      if (!paciente) throw new NotFoundException('Paciente no encontrado para esta historia');
+      pacienteId = paciente.id;
+    } else if (intervencion === INTERVENCION.TRIAJE) {
+      const triage = await this.triageService.listOne(id_intervencion);
+      if (!triage || !triage.historia) throw new NotFoundException('Triage o historia no encontrada');
+      const paciente = await this.pacienteService.findPacienteByHistoria(triage.historia.id);
+      if (!paciente) throw new NotFoundException('Paciente no encontrado para esta historia');
+      pacienteId = paciente.id;
+    } else {
+      throw new BadRequestException('Tipo de intervención no válido');
+    }
 
     const cama = await this.camaRepo.findOneBy({ id: id_cama });
     if (!cama) {
       throw new NotFoundException(`La cama con ID ${id_cama} no existe.`);
     }
-
     if (cama.estado !== ESTADO_CAMA.DISPONIBLE) {
-      throw new BadRequestException(`La cama ${cama.cama} no está disponible. Estado actual: ${cama.estado}`);
+      throw new BadRequestException(`La cama ${cama.cama} no está disponible.`);
     }
 
     cama.estado = ESTADO_CAMA.OCUPADA;
 
     const newHospitalizacion = this.hospitalizacionRepo.create({
       ...bodyHospitalizacion,
+      intervencion,
+      id_intervencion,
       medico: { id: id_medico },
       cama: cama,
+      paciente: { id: pacienteId }
     });
 
     await this.camaRepo.save(cama);
     await this.hospitalizacionRepo.save(newHospitalizacion);
 
-    return {message: 'Se añadió una nueva hospitalización y la cama fue marcada como ocupada.'};
+    return { message: 'Se añadió una nueva hospitalización y la cama fue marcada como ocupada.' };
   }
+
   async getCantidadCamasPorEstado() {
     const totalDisponibles = await this.camaRepo.count({
       where: { estado: ESTADO_CAMA.DISPONIBLE },
@@ -112,31 +133,40 @@ export class HospitalizacionService {
     }
   }
 
-  async findAlta(){
-    const listAlta=await this.hospitalizacionRepo.find({where:{estado:Estado_Hospitalizacion.ALTA},relations:['medico'],select:['id','diagnostico_alta','fecha_salida','intervencion','id_intervencion']})
-    if(!listAlta)throw new NotFoundException("No hay hospitalizaciones en estado de alta")
-      const alta=Promise.all(listAlta.map(async(hospit)=>{
-        let id
-        if(hospit.intervencion===INTERVENCION.TRIAJE){
-          const object_intervencion=await this.consultaService.findOne(hospit.id_intervencion)
-          id=object_intervencion.historia.id
-        }
-        if(hospit.intervencion===INTERVENCION.CONSULTA){
-          const object_intervencion=await this.triageService.listOne(hospit.id_intervencion)
-          id=object_intervencion.historia.id
-        }
-        const nombres=await this.pacienteService.listNameByHistoria(id)
-        return({
-          "id":hospit.id,
-          "nombres":nombres,
-          "diagnostico_ingreso":hospit.diagnostico_alta,
-          "nombre_medico":hospit.medico.nombres,
-          "apellido_medico":hospit.medico.apellidos,
-          "fecha_salida":hospit.fecha_salida,
-        })
-        }))
+  async findAlta() {
+    // 1. Hacemos la consulta a la base de datos
+    const listAlta = await this.hospitalizacionRepo.find({
+      where: { estado: Estado_Hospitalizacion.ALTA },
+      // 2. CORRECCIÓN: Añadimos 'paciente' y sus relaciones a la consulta
+      relations: ['paciente', 'paciente.historia', 'medico'],
+      order: { fecha_salida: 'DESC' } // Opcional: ordena los más recientes primero
+    });
 
-        return alta
+    if (listAlta.length === 0) {
+      return [];
+    }
+
+    // 3. Mapeamos el resultado al formato exacto que el frontend necesita
+    const informes = listAlta.map(hospit => {
+      return {
+        id: hospit.id,
+        paciente: hospit.paciente, // Ahora el objeto 'paciente' completo está aquí
+        diagnosticoIngreso: hospit.diagnostico_ingreso,
+        medicoTratante: `${hospit.medico.nombres} ${hospit.medico.apellidos}`,
+        fechaIngreso: hospit.fecha_ingreso,
+        cama: hospit.cama ? hospit.cama.cama : 'N/A',
+        area: hospit.area_destino,
+        estado: hospit.estado,
+        diagnostico_alta: hospit.diagnostico_alta,
+        diagnostico_secundario: hospit.diagnostico_secundario,
+        tratamiento_realizado: hospit.tratamiento_realizado,
+        recomendaciones_hogar: hospit.recomendaciones_hogar,
+        pronostico: hospit.pronostico,
+        fecha_salida: hospit.fecha_salida
+      };
+    });
+
+    return informes;
   }
 
   async findAllActive() {
@@ -210,14 +240,31 @@ export class HospitalizacionService {
     }
   }
 
-  async changeState(id:number,bodyAlta:darAltaDto){
-    const hospitalizacion=await this.findOne(id)
-    if(hospitalizacion.estado===Estado_Hospitalizacion.ALTA)throw new BadRequestException("Esta hospitalizacion ya esta dada de alta")
-    hospitalizacion.estado=Estado_Hospitalizacion.ALTA
-    hospitalizacion.fecha_salida=new Date()
-    Object.assign(hospitalizacion,bodyAlta)
-    await this.hospitalizacionRepo.save(hospitalizacion)
-    return `Se dio de alta al paciente con id ${id}`
+  async changeState(id: number, bodyAlta: darAltaDto) {
+    const hospitalizacion = await this.hospitalizacionRepo.findOne({
+      where: { id: id },
+      relations: ['paciente'],
+    });
+
+    if (!hospitalizacion) {
+      throw new NotFoundException(`No se encontró la hospitalización con el id: ${id}`);
+    }
+
+    if (hospitalizacion.estado === Estado_Hospitalizacion.ALTA) {
+      throw new BadRequestException("Esta hospitalizacion ya está dada de alta");
+    }
+
+    hospitalizacion.estado = Estado_Hospitalizacion.ALTA;
+    hospitalizacion.fecha_salida = new Date();
+    Object.assign(hospitalizacion, bodyAlta);
+
+    await this.hospitalizacionRepo.save(hospitalizacion);
+
+    const nombrePaciente = hospitalizacion.paciente
+      ? `${hospitalizacion.paciente.nombres} ${hospitalizacion.paciente.apellidos}`
+      : `con id ${id}`;
+
+    return { message: `Se dio de alta al paciente ${nombrePaciente}` };
   }
 
   

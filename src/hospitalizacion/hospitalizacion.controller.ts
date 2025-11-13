@@ -24,7 +24,7 @@ export class HospitalizacionController {
     return this.hospitalizacionService.findOne(+id);
   }
 
-  @Get('alta')
+  @Get('altas')
   listAlta(){
     return this.hospitalizacionService.findAlta()
   }
@@ -54,9 +54,9 @@ export class HospitalizacionController {
     return this.hospitalizacionService.remove(+id);
   }
 
-  @Patch('darAlta/:id')
-  dar_alta(@Param('id') id:number,@Body() body:darAltaDto){
-    return this.hospitalizacionService.changeState(+id,body)
+  @Patch('dar-alta/:id')
+  dar_alta(@Param('id') id: string, @Body() body: darAltaDto) {
+    return this.hospitalizacionService.changeState(+id, body);
   }
 
   @Get('camas/estadisticas')
