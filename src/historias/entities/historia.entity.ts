@@ -1,7 +1,6 @@
-import { Consulta } from "src/consultas/entities/consulta.entity";
-import { Medico } from "src/medicos/entities/medico.entity";
-import { Paciente } from "src/pacientes/entities/paciente.entity";
-import { Triage } from "src/triages/entities/triage.entity";
+import { Consulta } from "../../consultas/entities/consulta.entity";
+import { Paciente } from "../../pacientes/entities/paciente.entity";
+import { Triage } from "../../triages/entities/triage.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum TIPO_CONSULTA{

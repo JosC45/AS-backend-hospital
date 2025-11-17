@@ -21,16 +21,29 @@ export class UsuarioService {
   }
 
   async createUserByRol(body:CreateUsuarioDto){
-    try{
-    const exist=await this.usuarioRepo.findOneBy({username:body.username})
-    if(exist)throw new ConflictException("Ese usuario ya existe")
-    const hashedPassword=await bcrypt.hash(body.password,10)
-    const newUsuario=this.usuarioRepo.create({username:body.username,password:hashedPassword,rol:body.rol,estado:ESTADO_USUARIO.ACTIVO})
-    await this.usuarioRepo.save(newUsuario)
-    return newUsuario 
-    }catch(err){
-      console.log(err)
-      throw new InternalServerErrorException("Error al crear el usuario")
+    try {
+        const exist = await this.usuarioRepo.findOneBy({ username: body.username });
+        if (exist) throw new ConflictException("Ese usuario ya existe");
+
+        const hashedPassword = await bcrypt.hash(body.password, 10);
+
+        const newUsuario = this.usuarioRepo.create({
+            username: body.username,
+            password: hashedPassword,
+            rol: body.rol,
+            estado: ESTADO_USUARIO.ACTIVO
+        });
+
+        await this.usuarioRepo.save(newUsuario);
+        return newUsuario;
+
+    } catch (err) {
+
+        if (err instanceof ConflictException) {
+            throw err;
+        }
+
+        throw new InternalServerErrorException("Error al crear el usuario");
     }
   }
 

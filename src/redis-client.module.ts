@@ -8,8 +8,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'REDIS_CLIENT',
         transport: Transport.REDIS,
         options: {
-          host: 'localhost',
-          port: 55156,
+            host: 'localhost',
+          port: 6379,
         },
       },
     ]),

@@ -1,4 +1,4 @@
-import { Usuario } from "src/usuario/entities/usuario.entity";
+import { Usuario } from "../../usuario/entities/usuario.entity";
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum TIPO_MEDICO{

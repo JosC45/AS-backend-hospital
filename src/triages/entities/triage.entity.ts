@@ -1,4 +1,4 @@
-import { Historia } from "src/historias/entities/historia.entity";
+import { Historia } from "../../historias/entities/historia.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Prioridad{

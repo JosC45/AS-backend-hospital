@@ -1,5 +1,5 @@
-import { Historia } from "src/historias/entities/historia.entity";
-import { Medico } from "src/medicos/entities/medico.entity";
+import { Historia } from "../../historias/entities/historia.entity";
+import { Medico } from "../../medicos/entities/medico.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum TIPO_DIAGNOSTICO{

@@ -1,4 +1,4 @@
-import { Historia } from "src/historias/entities/historia.entity";
+import { Historia } from "../../historias/entities/historia.entity";
 import { Triage } from "src/triages/entities/triage.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 

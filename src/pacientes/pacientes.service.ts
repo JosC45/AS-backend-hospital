@@ -4,7 +4,7 @@ import { UpdatePacienteDto } from './dto/update-paciente.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { Paciente } from './entities/paciente.entity';
-import { HistoriasService } from 'src/historias/historias.service';
+import { HistoriasService } from '../historias/historias.service';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
