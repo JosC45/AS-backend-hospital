@@ -4,8 +4,8 @@ import { UpdatePersonalDto } from './dto/update-personal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Personal } from './entities/personal.entity';
 import { Repository } from 'typeorm';
-import { UsuarioService } from 'src/usuario/usuario.service';
-import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { UsuarioService } from '../usuario/usuario.service';
+import { ROLES_USUARIO } from '../usuario/entities/usuario.entity';
 
 @Injectable()
 export class PersonalService {

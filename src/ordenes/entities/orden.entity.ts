@@ -1,4 +1,4 @@
-import { Paciente } from "src/pacientes/entities/paciente.entity";
+import { Paciente } from "../../pacientes/entities/paciente.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Medicamento } from "./medicamentos.entity";
 

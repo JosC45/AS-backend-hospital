@@ -1,9 +1,7 @@
-import { Paciente } from "src/pacientes/entities/paciente.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Camas } from "./camas.entity";
 import { Medico } from "../../medicos/entities/medico.entity";
-import { Triage } from "src/triages/entities/triage.entity";
-import { Consulta } from "src/consultas/entities/consulta.entity";
+
 
 export enum Estado_Hospitalizacion{
     HOSPITALIZADO="hospitalizado",

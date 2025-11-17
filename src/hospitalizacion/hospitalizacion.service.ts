@@ -5,9 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AREA_DESTINO, Estado_Hospitalizacion, Hospitalizacion, INTERVENCION } from './entities/hospitalizacion.entity';
 import { darAltaDto } from './dto/dar-alta.dto';
-import { TriagesService } from 'src/triages/triages.service';
-import { ConsultasService } from 'src/consultas/consultas.service';
-import { PacientesService } from 'src/pacientes/pacientes.service';
+import { TriagesService } from '../triages/triages.service';
+import { ConsultasService } from '../consultas/consultas.service';
+import { PacientesService } from '../pacientes/pacientes.service';
 import { Camas, ESTADO_CAMA } from './entities/camas.entity';
 
 @Injectable()

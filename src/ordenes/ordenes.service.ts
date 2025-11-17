@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Orden } from './entities/orden.entity';
 import { Repository } from 'typeorm';
 import { Medicamento } from './entities/medicamentos.entity';
-import { Paciente } from 'src/pacientes/entities/paciente.entity';
+import { Paciente } from '../pacientes/entities/paciente.entity';
 
 @Injectable()
 export class OrdenesService {

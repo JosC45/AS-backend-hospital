@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Nota } from './entities/nota.entity';
 import { CreateNotaDto } from './dto/create-nota.dto';
-import { Hospitalizacion } from 'src/hospitalizacion/entities/hospitalizacion.entity';
-import { Medico } from 'src/medicos/entities/medico.entity';
+import { Hospitalizacion } from '../hospitalizacion/entities/hospitalizacion.entity';
+import { Medico } from '../medicos/entities/medico.entity';
 
 @Injectable()
 export class NotasService {

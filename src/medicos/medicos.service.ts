@@ -1,11 +1,11 @@
 import { BadRequestException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateMedicoDto } from './dto/create-medico.dto';
 import { UpdateMedicoDto } from './dto/update-medico.dto';
-import { UsuarioService } from 'src/usuario/usuario.service';
+import { UsuarioService } from '../usuario/usuario.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medico } from './entities/medico.entity';
 import { Repository } from 'typeorm';
-import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { ROLES_USUARIO } from '../usuario/entities/usuario.entity';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()

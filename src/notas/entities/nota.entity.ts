@@ -1,5 +1,5 @@
-import { Hospitalizacion } from "src/hospitalizacion/entities/hospitalizacion.entity";
-import { Medico } from "src/medicos/entities/medico.entity";
+import { Hospitalizacion } from "../../hospitalizacion/entities/hospitalizacion.entity";
+import { Medico } from "../../medicos/entities/medico.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { UsuarioService } from 'src/usuario/usuario.service';
+import { UsuarioService } from '../usuario/usuario.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Admin } from './entities/admin.entity';
 import { Repository } from 'typeorm';
-import { ROLES_USUARIO } from 'src/usuario/entities/usuario.entity';
+import { ROLES_USUARIO } from '../usuario/entities/usuario.entity';
 
 @Injectable()
 export class AdminService {

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { BodyAuthDto } from './dto/body-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Usuario } from 'src/usuario/entities/usuario.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'

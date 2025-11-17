@@ -1,5 +1,5 @@
-import { Medico } from "src/medicos/entities/medico.entity";
-import { Paciente } from "src/pacientes/entities/paciente.entity";
+import { Medico } from "../../medicos/entities/medico.entity";
+import { Paciente } from "../../pacientes/entities/paciente.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Especialidad{
