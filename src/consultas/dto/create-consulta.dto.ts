@@ -65,4 +65,8 @@ export class CreateConsultaDto {
     @IsString()
     @IsOptional()
     tratamiento?: string;
+
+    @IsOptional()
+    @IsNumber()
+    id_cita?: number;
 }

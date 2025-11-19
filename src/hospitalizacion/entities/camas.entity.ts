@@ -12,7 +12,7 @@ export enum ESTADO_CAMA{
     MANTENIMIENTO="mantenimiento"
 }
 
-@Entity()
+@Entity('camas')
 export class Camas{
     @PrimaryGeneratedColumn()
     id:number;
@@ -27,5 +27,5 @@ export class Camas{
     estado:ESTADO_CAMA
 
     @OneToMany(()=>Hospitalizacion,hospitalizacion=>hospitalizacion.cama)
-    hospitalizacion:Hospitalizacion[]
+    hospitalizaciones:Hospitalizacion[]
 }

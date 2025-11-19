@@ -4,26 +4,54 @@ import { UpdateTriageDto } from './dto/update-triage.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Triage } from './entities/triage.entity';
 import { Repository } from 'typeorm';
+import { CreateConsultaDto } from 'src/consultas/dto/create-consulta.dto';
+import { ConsultasService } from 'src/consultas/consultas.service';
 
 @Injectable()
 export class TriagesService {
   constructor(
     @InjectRepository(Triage)
-    private triageRepo:Repository<Triage>
+    private triageRepo:Repository<Triage>,
+    private readonly consultasService: ConsultasService,
   ){}
 
   async create(createTriageDto: CreateTriageDto) {
-    const { id_historia, ...triageData } = createTriageDto;
+    const { id_historia, id_medico, ...triageData } = createTriageDto;
+
     const newTriage = this.triageRepo.create({
       ...triageData,
       historia: { id: id_historia },
       fecha_creacion: new Date()
     });
-    return await this.triageRepo.save(newTriage);
+
+    const savedTriage = await this.triageRepo.save(newTriage);
+
+    const consultaDto: CreateConsultaDto = {
+      id_historia: savedTriage.historia.id,
+      id_medico: id_medico,
+      fecha_atencion: savedTriage.fecha_creacion,
+      motivo_consulta: `Evaluación de triage: ${savedTriage.motivo}`,
+      presion_arterial: savedTriage.presion_arterial,
+      latidos_pm: savedTriage.latidos_pm,
+      frecuencia_respiratoria: savedTriage.frecuencia_respiratoria,
+      temperatura: savedTriage.temperatura,
+      observaciones: `Prioridad: ${savedTriage.prioridad}. ${savedTriage.observaciones}`,
+      descripcion_diagnostico: 'Diagnóstico pendiente por especialista',
+      tratamiento: 'Plan a definir por especialista',
+    };
+
+    try {
+      await this.consultasService.create(consultaDto);
+      console.log(`Consulta creada automáticamente para el Triage ID: ${savedTriage.id}`);
+    } catch (error) {
+      console.error(`ERROR: No se pudo crear la consulta automática para el Triage ID: ${savedTriage.id}`, error);
+    }
+
+    return savedTriage;
   }
 
+
   async findAll() {
-    // --- ¡LA SOLUCIÓN DEFINITIVA CON QUERYBUILDER! ---
     const listTriages = await this.triageRepo
       .createQueryBuilder('triage') // Alias para la tabla Triage
       .innerJoinAndSelect('triage.historia', 'historia') // Unimos y seleccionamos la historia
@@ -32,13 +60,11 @@ export class TriagesService {
       .andWhere('paciente.deletedAt IS NULL') // Condición 2: El paciente NO debe estar borrado lógicamente
       .getMany(); // Obtenemos las entidades anidadas correctamente
 
-    // El throw por si no se encuentra nada sigue siendo válido
     if(listTriages.length === 0) throw new NotFoundException("No se encontraron triages en proceso para pacientes activos");
     
     return listTriages;
   }
 
-  // ... (El resto de tus funciones no necesitan cambios)
   async listOne(id:number){
     const triage=await this.triageRepo.findOne({where:{id},relations:['historia']})
     if(!triage)throw new NotFoundException("No se encontro la consulta con ese id")

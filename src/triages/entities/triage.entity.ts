@@ -2,10 +2,11 @@ import { Historia } from "src/historias/entities/historia.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Prioridad{
-    PRIORIDADI="Prioridad_I",
-    PRIORIDADII="Prioridad_II",
-    PRIORIDADIII="Prioridad_III",
-    PRIORIDADIV="Prioridad_IV"
+    ROJO = 'rojo',
+    NARANJA = 'naranja',
+    AMARILLO = 'amarillo',
+    VERDE = 'verde',
+    AZUL = 'azul',
 }
 
 @Entity()

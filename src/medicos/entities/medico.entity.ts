@@ -1,5 +1,7 @@
+import { Cita } from "src/citas/entities/cita.entity";
+import { Hospitalizacion } from "src/hospitalizacion/entities/hospitalizacion.entity";
 import { Usuario } from "src/usuario/entities/usuario.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum TIPO_MEDICO{
     ASISTENTE="asistente",
@@ -36,4 +38,10 @@ export class Medico {
     @OneToOne(() => Usuario, (usuario) => usuario.medico)
     @JoinColumn({ name: 'usuarioId' })
     usuario: Usuario;
+
+    @OneToMany(() => Hospitalizacion, (hospitalizacion) => hospitalizacion.medico)
+    hospitalizaciones: Hospitalizacion[];
+
+    @OneToMany(() => Cita, (cita) => cita.medico)
+    citas: Cita[];
 }

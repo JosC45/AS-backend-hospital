@@ -40,6 +40,13 @@ export class HistoriasService {
 
     if (!historia) throw new NotFoundException('Historia no encontrada');
 
+    const consultasSeguras = historia.consulta.map(c => ({
+      ...c,
+      medico: c.medico
+        ? { id: c.medico.id, nombres: c.medico.nombres, apellidos: c.medico.apellidos }
+        : { id: null, nombres: 'Médico', apellidos: 'No Asignado' }
+    }));
+
     const consultaIds = historia.consulta.map(c => c.id);
     let estaHospitalizado = false;
     if (consultaIds.length > 0) {
@@ -53,7 +60,11 @@ export class HistoriasService {
       estaHospitalizado = !!hospitalizacionActiva;
     }
 
-    return { ...historia, estaHospitalizado };
+    return {
+      ...historia,
+      consulta: consultasSeguras,
+      estaHospitalizado
+    };
   }
 
   // async update(id: number, updateHistoriaDto: UpdateHistoriaDto) {

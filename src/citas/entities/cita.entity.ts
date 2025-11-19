@@ -1,32 +1,49 @@
 import { Medico } from "src/medicos/entities/medico.entity";
 import { Paciente } from "src/pacientes/entities/paciente.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
 
-export enum Especialidad{
-    EMERGENCIA="emergencia",
-    CONSULTORIO_EXTERNO="consultorio_externo",
-    HOSPITALIZACION="hospitalizacion"
+export enum EspecialidadCita {
+    CONSULTORIO_EXTERNO = "consultorio_externo",
+    PROCEDIMIENTO = "procedimiento",
+    OTRO = "otro",
 }
 
-@Entity()
+export enum EstadoCita {
+    PROGRAMADA = "Programada",
+    CONFIRMADA = "Confirmada",
+    COMPLETADA = "Completada",
+    CANCELADA = "Cancelada",
+    AUSENTE = "Ausente",
+}
+
+@Entity('cita')
 export class Cita {
     @PrimaryGeneratedColumn()
-    id:number;
+    id: number;
 
-    @ManyToOne(()=>Paciente)
-    @JoinColumn({name:'id_paciente'})
-    paciente:Paciente;
+    @ManyToOne(() => Paciente, paciente => paciente.citas)
+    @JoinColumn({ name: 'id_paciente' })
+    paciente: Paciente;
 
-    @ManyToOne(()=>Medico)
-    @JoinColumn({name:'id_medico'})
-    medico:Medico;
+    @ManyToOne(() => Medico, medico => medico.citas) 
+    @JoinColumn({ name: 'id_medico' })
+    medico: Medico;
 
-    @Column({type:'enum',enum:Especialidad})
-    especialidad:Especialidad;
-
-    @Column()
-    fecha_atencion:Date;
+    @Column({ type: 'enum', enum: EspecialidadCita })
+    especialidad: EspecialidadCita;
 
     @Column()
-    motivo:string
+    fecha_hora_inicio: Date;
+
+    @Column()
+    fecha_hora_fin: Date;
+
+    @Column()
+    motivo: string;
+
+    @Column({ type: 'enum', enum: EstadoCita, default: EstadoCita.PROGRAMADA })
+    estado: EstadoCita;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

@@ -6,24 +6,29 @@ import { IsNull, Repository } from 'typeorm';
 import { Paciente } from './entities/paciente.entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { Historia } from 'src/historias/entities/historia.entity';
+import { Hospitalizacion } from 'src/hospitalizacion/entities/hospitalizacion.entity';
+import { Orden } from 'src/ordenes/entities/orden.entity';
 
 @Injectable()
-export class PacientesService implements OnModuleInit {
+export class PacientesService {
   constructor(
-    @Inject('REDIS_CLIENT') private client: ClientProxy,
     @InjectRepository(Paciente)
     private pacienteRepo: Repository<Paciente>,
+
+    @InjectRepository(Hospitalizacion)
+    private hospitalizacionRepo: Repository<Hospitalizacion>,
+
+    @InjectRepository(Orden)
+    private ordenRepo: Repository<Orden>,
+
     @InjectRepository(Historia)
     private historiaRepo: Repository<Historia>,
-  ) {}
+
+  ) { this.countPacientes(); }
 
   async onModuleInit() {
     console.log('🚀 PacienteService iniciado, contando pacientes...');
     await this.countPacientes();
-  }
-
-  emitirEvento() {
-    this.client.emit('test_channel', { message: 'Prueba de evento' });
   }
 
   async create(createPacienteDto: CreatePacienteDto) {
@@ -43,13 +48,8 @@ export class PacientesService implements OnModuleInit {
   }
 
   async countPacientes() {
-    const [, numPacientes] = await this.pacienteRepo.findAndCount({ where: { deletedAt: IsNull() } });
-    this.client.emit('cantidad_pacientes', {
-      total: numPacientes,
-      source: 'pacientes_service',
-      updatedAt: new Date(),
-    });
-    console.log('🔴 Emitiendo cantidad_pacientes:', numPacientes);
+      const cantidad = await this.pacienteRepo.count();
+      console.log('🚀 PacienteService iniciado, contando pacientes...');
   }
 
   async findAll() {
@@ -94,10 +94,28 @@ export class PacientesService implements OnModuleInit {
     return updatedPaciente;
   }
 
-  async remove(id: number) {
-    const result = await this.pacienteRepo.softDelete({ id });
-    if (result.affected === 0) throw new BadRequestException("Paciente no encontrado");
-    await this.countPacientes();
-    return { message: `Se eliminó correctamente el paciente con id: ${id}`, success: true };
+  async remove(id: number): Promise<{ message: string }> {
+    const paciente = await this.pacienteRepo.findOne({
+      where: { id },
+      relations: ['hospitalizaciones', 'ordenes'],
+    });
+
+    if (!paciente) {
+      throw new NotFoundException(`Paciente con ID ${id} no encontrado`);
+    }
+
+    if (paciente.hospitalizaciones && paciente.hospitalizaciones.length > 0) {
+      const idsToDelete = paciente.hospitalizaciones.map(h => h.id);
+      await this.hospitalizacionRepo.softDelete(idsToDelete);
+    }
+
+    if (paciente.ordenes && paciente.ordenes.length > 0) {
+      const idsToDelete = paciente.ordenes.map(o => o.id);
+      await this.ordenRepo.softDelete(idsToDelete);
+    }
+
+    await this.pacienteRepo.softDelete(id);
+
+    return { message: `Paciente ${paciente.nombres} ${paciente.apellidos} y todos sus registros asociados han sido eliminados.` };
   }
 }

@@ -10,11 +10,6 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 export class PacientesController {
   constructor(private readonly pacientesService: PacientesService) {}
 
-
-  @Get('test')
-  test(){
-    return this.pacientesService.emitirEvento();
-  }
   // @UseGuards(JwtAuthGuard)
   @Post('add')
   create(@Body() createPacienteDto: CreatePacienteDto) {

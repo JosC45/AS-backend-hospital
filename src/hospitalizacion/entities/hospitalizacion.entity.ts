@@ -1,7 +1,5 @@
-// src/hospitalizacion/entities/hospitalizacion.entity.ts
-
 import { Paciente } from "src/pacientes/entities/paciente.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
 import { Camas } from "./camas.entity";
 import { Medico } from "src/medicos/entities/medico.entity";
 import { Triage } from "src/triages/entities/triage.entity";
@@ -21,9 +19,9 @@ export enum AREA_DESTINO {
 export enum INTERVENCION {
     TRIAJE = "triaje",
     CONSULTA = "consulta"
-}
+} 
 
-@Entity('hospitalizacion') // Es una buena práctica nombrar la tabla en plural
+@Entity('hospitalizacion')
 export class Hospitalizacion {
     @PrimaryGeneratedColumn()
     id: number;
@@ -47,20 +45,16 @@ export class Hospitalizacion {
     area_destino: AREA_DESTINO;
     
     @ManyToOne(() => Paciente, (paciente) => paciente.hospitalizaciones)
-    @JoinColumn({ name: "id_paciente" }) // ¡IMPORTANTE! Asegúrate que "id_paciente" es el nombre de tu foreign key en la BD
+    @JoinColumn({ name: "id_paciente" })
     paciente: Paciente;
 
-    @ManyToOne(() => Camas)
+    @ManyToOne(() => Camas, (cama) => cama.hospitalizaciones)
     @JoinColumn({ name: "id_cama" })
     cama: Camas;
 
-    @ManyToOne(() => Medico)
+    @ManyToOne(() => Medico, (medico) => medico.hospitalizaciones)
     @JoinColumn({ name: "id_medico" })
     medico: Medico;
-
-    // =================================================================
-    // CAMPOS DE ALTA
-    // =================================================================
 
     @Column({ nullable: true })
     diagnostico_alta: string;
@@ -79,4 +73,7 @@ export class Hospitalizacion {
 
     @Column({ nullable: true })
     fecha_salida: Date;
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

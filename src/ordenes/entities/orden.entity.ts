@@ -1,5 +1,5 @@
 import { Paciente } from "src/pacientes/entities/paciente.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
 import { Medicamento } from "./medicamentos.entity";
 
 export enum LugarEmision{
@@ -14,7 +14,7 @@ export class Orden {
     @PrimaryGeneratedColumn()
     id:number;
 
-    @ManyToOne(()=>Paciente)
+    @ManyToOne(() => Paciente, (paciente) => paciente.ordenes)
     @JoinColumn({name:'id_paciente'})
     paciente:Paciente;
 
@@ -32,4 +32,7 @@ export class Orden {
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     fecha_creacion:Date
+
+    @DeleteDateColumn()
+    deletedAt: Date;
 }

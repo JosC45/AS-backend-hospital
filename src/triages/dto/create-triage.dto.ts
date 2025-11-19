@@ -4,7 +4,11 @@ import { Prioridad } from "../entities/triage.entity";
 export class CreateTriageDto {
     @IsNumber()
     @IsNotEmpty()
-    id_historia: number; // Relacionado con la entidad Historia
+    id_historia: number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    id_medico: number;
 
     @IsString()
     @IsNotEmpty()

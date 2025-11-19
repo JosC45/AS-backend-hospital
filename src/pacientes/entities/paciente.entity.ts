@@ -3,8 +3,9 @@
 import { Historia } from "src/historias/entities/historia.entity";
 import { Triage } from "src/triages/entities/triage.entity";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, DeleteDateColumn } from "typeorm";
-// CAMBIO: Importamos la entidad Hospitalizacion
+import { Orden } from "src/ordenes/entities/orden.entity";
 import { Hospitalizacion } from "src/hospitalizacion/entities/hospitalizacion.entity";
+import { Cita } from "src/citas/entities/cita.entity";
 
 export enum GENERO {
     MASCULINO = "masculino",
@@ -18,7 +19,7 @@ export enum SEGURO {
     PARTICULAR = "Particular"
 }
 
-@Entity('paciente') // Es buena práctica nombrar la tabla en plural
+@Entity('paciente')
 export class Paciente {
     @PrimaryGeneratedColumn()
     id: number;
@@ -62,4 +63,10 @@ export class Paciente {
 
     @OneToMany(() => Hospitalizacion, (hospitalizacion) => hospitalizacion.paciente)
     hospitalizaciones: Hospitalizacion[];
+
+    @OneToMany(() => Orden, (orden) => orden.paciente)
+    ordenes: Orden[];
+
+    @OneToMany(() => Cita, (cita) => cita.paciente)
+    citas: Cita[];
 }

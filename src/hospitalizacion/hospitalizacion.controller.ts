@@ -9,6 +9,11 @@ import { AREA_DESTINO } from './entities/hospitalizacion.entity';
 export class HospitalizacionController {
   constructor(private readonly hospitalizacionService: HospitalizacionService) {}
 
+  @Get('test-cama/:id')
+  testCamaRelacion(@Param('id') id: string) {
+    return this.hospitalizacionService.testCamaRelacion(+id);
+  }
+
   @Post('add')
   create(@Body() createHospitalizacionDto: CreateHospitalizacionDto) {
     return this.hospitalizacionService.create(createHospitalizacionDto);

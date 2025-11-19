@@ -1,112 +1,104 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateConsultaDto } from './dto/create-consulta.dto';
 import { UpdateConsultaDto } from './dto/update-consulta.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Consulta } from './entities/consulta.entity';
-import { Between, Not, Repository } from 'typeorm';
-import { ClientProxy } from '@nestjs/microservices';
+import { Consulta, ESTADO_CONSULTA } from './entities/consulta.entity';
+import { Cita, EstadoCita } from 'src/citas/entities/cita.entity';
+import { Between, Repository } from 'typeorm';
 
 @Injectable()
-export class ConsultasService implements OnModuleInit {
+export class ConsultasService {
   constructor(
-    @Inject('REDIS_CLIENT') private client:ClientProxy,
-
     @InjectRepository(Consulta)
-    private consultaRepo:Repository<Consulta>
-  ){}
-
-  async onModuleInit() {
-    console.log('🚀 ConsultasService iniciado, contando consultas...');
-    await this.counConsultasHoy();
-  }
+    private consultaRepo: Repository<Consulta>,
+    @InjectRepository(Cita)
+    private citaRepo: Repository<Cita>,
+  ) { }
 
   async create(createConsultaDto: CreateConsultaDto) {
-    const { id_historia, id_medico, ...bodyConsulta } = createConsultaDto;
-    const newConsulta = this.consultaRepo.create({
+    const { id_historia, id_medico, id_cita, ...bodyConsulta } = createConsultaDto;
+
+    const consultaToCreate = {
       ...bodyConsulta,
       historia: { id: id_historia },
       medico: { id: id_medico },
       fecha_creacion: new Date(),
-      estado: 'proceso'
-    });
+      estado: ESTADO_CONSULTA.FINALIZADO,
+    };
 
+    if (id_cita) {
+      const cita = await this.citaRepo.findOneBy({ id: id_cita });
+      if (!cita) throw new NotFoundException(`La cita con ID ${id_cita} no fue encontrada.`);
+      consultaToCreate['cita'] = { id: id_cita };
+    }
+
+    const newConsulta = this.consultaRepo.create(consultaToCreate);
     const savedConsulta = await this.consultaRepo.save(newConsulta);
-    await this.counConsultasHoy();
-    
-    return this.consultaRepo.findOne({
-      where: { id: savedConsulta.id },
-      relations: ['medico', 'historia']
-    });
+
+    if (id_cita) {
+      await this.citaRepo.update({ id: id_cita }, { estado: EstadoCita.COMPLETADA });
+    }
+
+    return this.findOne(savedConsulta.id);
   }
 
   async findConsultasDeHoy(): Promise<Consulta[]> {
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); 
-  
+    hoy.setHours(0, 0, 0, 0);
     const mañana = new Date();
-    mañana.setHours(23, 59, 59, 999); 
-  
-    const consultas = await this.consultaRepo.find({
-      where: {
-        fecha_atencion: Between(hoy, mañana),
+    mañana.setHours(23, 59, 59, 999);
+
+    return this.consultaRepo.find({
+      where: { fecha_atencion: Between(hoy, mañana) },
+    });
+  }
+
+  async findAll(): Promise<Consulta[]> {
+    return this.consultaRepo.find({
+      relations: ['historia', 'medico', 'historia.paciente'],
+      order: {
+        fecha_atencion: 'DESC',
       },
     });
-  
-    return consultas;
-  }
-
-  async counConsultasHoy(){
-    const consultasHoy = await this.findConsultasDeHoy();
-    this.client.emit('cantidad_consultas_hoy', {
-      total: consultasHoy.length,
-      source: 'consultas_service',
-      updatedAt: new Date(),
-    });
-    console.log('🔴 Emitiendo cantidad_consultas_hoy:', consultasHoy.length);
-  }
-
-  findAll() {
-    return `This action returns all consultas`;
   }
 
   async findOne(id: number) {
-    const consulta=await this.consultaRepo.findOne({
-      where:{id},
-      relations:['historia', 'medico']
+    const consulta = await this.consultaRepo.findOne({
+      where: { id },
+      relations: ['historia', 'medico', 'historia.paciente'],
     });
-    if(!consulta)throw new NotFoundException("No se encontro la consulta con ese id");
+    if (!consulta) throw new NotFoundException("No se encontro la consulta con ese id");
     return consulta;
   }
 
-  async listByHistoria(id:number){
-    const consultas=await this.consultaRepo.find({where:{id},select:['motivo_consulta','descripcion_diagnostico','codigo','tipo_diagnostico','tratamiento','fecha_atencion','fecha_creacion']})
-    if(consultas.length===0)throw new NotFoundException("No se encontro consultas con ese id")
-    return consultas
+  async listByHistoria(id: number) {
+    const consultas = await this.consultaRepo.find({
+      where: { historia: { id: id } },
+      relations: ['medico'],
+      order: { fecha_atencion: 'DESC' }
+    });
+    return consultas;
   }
 
   async update(id: number, updateConsultaDto: UpdateConsultaDto) {
     const consulta = await this.consultaRepo.findOne({ where: { id } });
-    if (!consulta ) throw new NotFoundException(`Consulta con id ${id} no encontrada`);
+    if (!consulta) throw new NotFoundException(`Consulta con id ${id} no encontrada`);
 
-    if (updateConsultaDto.id_historia) consulta.historia = { id: updateConsultaDto.id_historia } as any;
-    if(updateConsultaDto.id_medico) consulta.medico={id:updateConsultaDto.id_medico} as any;
-    
-    Object.assign(consulta , updateConsultaDto);
+    Object.assign(consulta, updateConsultaDto);
     await this.consultaRepo.save(consulta);
 
-    // Devolvemos la entidad completa y actualizada
     return this.findOne(id);
   }
 
-  async finish(id:number){
-    const finished=await this.consultaRepo.update({id},{estado:'finalizado'});
-    if(finished.affected===0) throw new BadRequestException("No se pudo finalizar la consulta");
+  async finish(id: number) {
+    const finished = await this.consultaRepo.update({ id }, { estado: ESTADO_CONSULTA.FINALIZADO });
+    if (finished.affected === 0) throw new BadRequestException("No se pudo finalizar la consulta");
     return { message: `Se finalizó correctamente la consulta con id ${id}`, success: true };
   }
-  
+
   async remove(id: number) {
-    const deleteConsulta=await this.consultaRepo.delete({id});
-    if(deleteConsulta.affected===0) throw new BadRequestException("No se eliminó ninguna consulta");
+    const deleteConsulta = await this.consultaRepo.delete({ id });
+    if (deleteConsulta.affected === 0) throw new BadRequestException("No se eliminó ninguna consulta");
     return { message: `Se eliminó la consulta con id: ${id}`, success: true };
   }
 }

@@ -1,11 +1,17 @@
+import { Cita } from "src/citas/entities/cita.entity";
 import { Historia } from "src/historias/entities/historia.entity";
 import { Medico } from "src/medicos/entities/medico.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum TIPO_DIAGNOSTICO{
     PRESUNTIVO="presuntivo",
     DEFINITIVO="definitivo",
     REPETITIVO="repetitivo"
+}
+
+export enum ESTADO_CONSULTA {
+    FINALIZADO = 'finalizado',
+    HOSPITALIZACION_ORDENADA = 'hospitalizacion_ordenada'
 }
 
 @Entity()
@@ -62,11 +68,19 @@ export class Consulta {
     @Column()
     fecha_creacion:Date;
     
-    @Column({default:'proceso'})
-    estado: 'proceso' | 'finalizado';
+    @Column({
+        type: 'enum',
+        enum: ESTADO_CONSULTA,
+        default: ESTADO_CONSULTA.FINALIZADO
+    })
+    estado: ESTADO_CONSULTA;
 
     @ManyToOne(()=>Historia)
     @JoinColumn({name:'id_historia'})
     historia:Historia
+
+    @OneToOne(() => Cita)
+    @JoinColumn({ name: 'id_cita' })
+    cita: Cita;
 
 }
