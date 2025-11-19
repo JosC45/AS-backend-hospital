@@ -4,7 +4,7 @@ export class AgregarDeletedAt1763530151013 implements MigrationInterface {
     name = 'AgregarDeletedAt1763530151013'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE \`consulta\` DROP FOREIGN KEY \`FK_consulta_cita\``);
+        // await queryRunner.query(`ALTER TABLE \`consulta\` DROP FOREIGN KEY \`FK_consulta_cita\``);
         await queryRunner.query(`ALTER TABLE \`hospitalizacion\` DROP FOREIGN KEY \`FK_hospitalizacion_paciente\``);
         await queryRunner.query(`ALTER TABLE \`consulta\` DROP COLUMN \`estado\``);
         await queryRunner.query(`ALTER TABLE \`consulta\` ADD \`estado\` enum ('finalizado', 'hospitalizacion_ordenada') NOT NULL DEFAULT 'finalizado'`);
