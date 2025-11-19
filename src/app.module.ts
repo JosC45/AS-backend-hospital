@@ -34,7 +34,7 @@ import { CitasModule } from './citas/citas.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: ENTITIES, 
-        synchronize: false,  
+        synchronize: true,  
       }),
       inject: [ConfigService],
     }), 
