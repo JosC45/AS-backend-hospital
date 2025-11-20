@@ -20,6 +20,7 @@ import { RedisClientModule } from './redis-client.module';
 import { NotasModule } from './notas/notas.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { CitasModule } from './citas/citas.module';
+import { KeywordModule } from './keyword/keyword.module';
 
 @Module({
   imports: [
@@ -40,7 +41,7 @@ import { CitasModule } from './citas/citas.module';
       inject: [ConfigService],
     }), 
     RedisClientModule,
-    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule, ConsultasModule, NotasModule, OrdenesModule, CitasModule],
+    UsuarioModule, AuthModule, PacientesModule, TriagesModule, MedicosModule, PersonalModule, AdminModule, HistoriasModule, HospitalizacionModule, ConsultasModule, NotasModule, OrdenesModule, CitasModule, KeywordModule],
   controllers: [AppController],
   providers: [AppService],
 })

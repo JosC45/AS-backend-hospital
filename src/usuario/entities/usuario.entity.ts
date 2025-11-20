@@ -1,4 +1,5 @@
-    import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+    import { Keyword } from "src/keyword/entities/keyword.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
     export enum ESTADO_USUARIO{
         ACTIVO="activo",
@@ -26,4 +27,8 @@
 
         @Column()
         estado:ESTADO_USUARIO;
+
+        @OneToOne(()=>Keyword,{cascade:true})
+        @JoinColumn()
+        keyword:Keyword
     }
