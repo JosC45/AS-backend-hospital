@@ -1,7 +1,8 @@
 import { Medico } from "src/medicos/entities/medico.entity";
 import { Personal } from "src/personal/entities/personal.entity";
 import { Admin } from "src/admin/entities/admin.entity";
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Keyword } from "src/keyword/entities/keyword.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
     export enum ESTADO_USUARIO{
         ACTIVO="activo",
@@ -38,4 +39,8 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
         @OneToOne(() => Personal, (personal) => personal.usuario)
         personal: Personal;
+        
+        @OneToOne(()=>Keyword,{cascade:true})
+        @JoinColumn()
+        keyword:Keyword
     }
