@@ -5,31 +5,42 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { KeywordService } from 'src/keyword/keyword.service';
 
 @Injectable()
 export class UsuarioService {
   constructor(
+    private readonly keywordService:KeywordService,
+
     @InjectRepository(Usuario)
     private readonly usuarioRepo: Repository<Usuario>,
-  ) { }
+
+  ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto) {
-    const { password, ...userData } = createUsuarioDto;
+    const { password, keyword,...userData } = createUsuarioDto;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = this.usuarioRepo.create({
       ...userData,
       password: hashedPassword,
     });
+
+    const palabra_clave=await this.keywordService.assign_keyword({keyword,usuario:newUser})
+
+    newUser.keyword=palabra_clave
     return this.usuarioRepo.save(newUser);
   }
 
   async createUserByRol(createUsuarioDto: CreateUsuarioDto) {
-    const { password, ...userData } = createUsuarioDto;
+    const { password, keyword,...userData } = createUsuarioDto;
     const hashedPassword = await bcrypt.hash(String(password), 10);
     const newUser = this.usuarioRepo.create({
       ...userData,
       password: hashedPassword,
     });
+    const palabra_clave=await this.keywordService.assign_keyword({keyword,usuario:newUser})
+
+    newUser.keyword=palabra_clave
     return this.usuarioRepo.save(newUser);
   }
 
@@ -56,10 +67,11 @@ export class UsuarioService {
   }
 
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    if (updateUsuarioDto.password) {
-      updateUsuarioDto.password = await bcrypt.hash(updateUsuarioDto.password, 10);
+    const { keyword, ...updateUsuario}=updateUsuarioDto
+    if (updateUsuario.password) {
+      updateUsuario.password = await bcrypt.hash(updateUsuarioDto.password, 10);
     }
-    await this.usuarioRepo.update(id, updateUsuarioDto);
+    await this.usuarioRepo.update(id, {...updateUsuario});
     return this.findOne(id);
   }
 

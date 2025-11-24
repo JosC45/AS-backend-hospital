@@ -31,7 +31,8 @@ export class MedicosService  implements OnModuleInit{
       username: usuario.username,
       password: usuario.password,
       rol: usuario.rol,
-      estado: usuario.estado
+      estado: usuario.estado,
+      keyword:usuario.keyword
     });
 
     const newMedico = this.medicoRepo.create({
@@ -69,7 +70,8 @@ export class MedicosService  implements OnModuleInit{
   }
 
   async update(id: number, updateMedicoDto: UpdateMedicoDto) {
-    const updatedMedico=await this.medicoRepo.update(id,updateMedicoDto)
+    const {usuario,...updateMedico}=updateMedicoDto
+    const updatedMedico=await this.medicoRepo.update(id,{...updateMedico})
     if(updatedMedico.affected===0)throw new BadRequestException("No se modifico ningun medico")
     return `Se actualizo el medico con id: ${id}`;
   }

@@ -9,7 +9,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.REDIS,
         options: {
           host: 'localhost',
-          port: 55156,
+          port: 6379,
         },
       },
     ]),

@@ -23,7 +23,8 @@ export class PersonalService {
       username: usuario.username,
       password: usuario.password,
       rol: usuario.rol,
-      estado: usuario.estado
+      estado: usuario.estado,
+      keyword: usuario.keyword
     });
     
     const newPersonal = this.personalRepo.create({
@@ -52,7 +53,8 @@ export class PersonalService {
   }
 
   async update(id: number, updatePersonalDto: UpdatePersonalDto) {
-    const updatedPersonal=await this.personalRepo.update(id,updatePersonalDto)
+    const {usuario, ...updatePersonal}=updatePersonalDto
+    const updatedPersonal=await this.personalRepo.update(id,{...updatePersonal})
     if(updatedPersonal.affected===0)throw new BadRequestException("No se actualizo ningun registro")
     return `Se actualizo el registro con id ${id} `;
   }

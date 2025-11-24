@@ -13,6 +13,10 @@ export class CreateUsuarioDto {
     @IsEnum(ROLES_USUARIO)
     rol: ROLES_USUARIO;
 
+    @IsString()
+    @IsNotEmpty()
+    keyword:string
+
     @IsEnum(ESTADO_USUARIO)
     estado: ESTADO_USUARIO;
 }

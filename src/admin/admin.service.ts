@@ -21,7 +21,8 @@ export class AdminService {
       username: usuario.username,
       password: usuario.password,
       rol: usuario.rol,
-      estado: usuario.estado
+      estado: usuario.estado,
+      keyword:usuario.keyword
     });
 
     const newAdmin = this.adminRepo.create({

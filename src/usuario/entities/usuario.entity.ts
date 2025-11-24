@@ -38,9 +38,10 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "ty
         admin: Admin;
 
         @OneToOne(() => Personal, (personal) => personal.usuario)
+        @JoinColumn()
         personal: Personal;
         
-        @OneToOne(()=>Keyword,{cascade:true})
+        @OneToOne(()=>Keyword,keyword => keyword.usuario,{cascade:true})
         @JoinColumn()
         keyword:Keyword
     }

@@ -10,6 +10,5 @@ export class Keyword {
     palabra_clave:string;
 
     @OneToOne(()=>Usuario,usuario=>usuario.keyword)
-    @JoinColumn()
     usuario:Usuario;
 }
