@@ -21,7 +21,24 @@ export class AuthController {
   findOne(@Param('id') id: string) {
     return this.authService.findOne(+id);
   }
+  
+  @Patch('password/:id')
+  async changePassword(@Param('id') id:string,@Body() body:{new_password:string,repeat_password:string}){
 
+    const {new_password,repeat_password}=body
+    if(new_password===repeat_password){
+      const response=await this.authService.changePassword(+id,new_password)
+
+      return response
+    }else{
+      return {message:"No coinciden las contraseñas"}
+    }
+  }
+
+  @Post('logout')
+  logout() {
+    return this.authService.logout();
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {

@@ -17,6 +17,11 @@ export class MedicosController {
     return this.medicosService.findAll();
   }
 
+  @Get('count')
+  count(){
+    return this.medicosService.countMedicos()
+  }
+
   @Get('list/:id')
   findOne(@Param('id') id: string) {
     return this.medicosService.findOne(+id);

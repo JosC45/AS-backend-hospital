@@ -9,9 +9,9 @@ import { ESTADO_USUARIO, ROLES_USUARIO } from 'src/usuario/entities/usuario.enti
 import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class MedicosService  implements OnModuleInit{
+export class MedicosService{
   constructor(
-    @Inject('REDIS_CLIENT') private client:ClientProxy,
+    
     private readonly usuarioService:UsuarioService,
 
     @InjectRepository(Medico)
@@ -19,10 +19,7 @@ export class MedicosService  implements OnModuleInit{
   ){
   }
 
-  async onModuleInit() {
-    console.log('🚀 MedicosService iniciado, contando médicos...');
-    await this.countMedicos();
-  }
+  
 
   async create(createMedicoDto: CreateMedicoDto) {
     const { usuario, ...medicoProfileData } = createMedicoDto;
@@ -53,12 +50,8 @@ export class MedicosService  implements OnModuleInit{
 
   async countMedicos(){
     const [,numeroMedicos]=await this.medicoRepo.findAndCount()
-    this.client.emit('cantidad_medicos',{
-      total: numeroMedicos,
-      source: 'medicos_service',
-      updatedAt: new Date(),
-    })
-    console.log('🔴 Emitiendo cantidad_pacientes:', numeroMedicos);
+    //console.log('🔴 Emitiendo cantidad_pacientes:', numeroMedicos);
+    return numeroMedicos
   }
   async findOne(id: number) {
     try{

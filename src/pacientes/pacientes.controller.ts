@@ -21,6 +21,10 @@ export class PacientesController {
     return this.pacientesService.findAll();
   }
 
+  @Get('count')
+  count(){
+    return this.pacientesService.countPacientes()
+  }
 
   @Get('list/:id')
   findOne(@Param('id') id: string) {

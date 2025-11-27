@@ -24,12 +24,9 @@ export class PacientesService {
     @InjectRepository(Historia)
     private historiaRepo: Repository<Historia>,
 
-  ) { this.countPacientes(); }
+  ) { }
 
-  async onModuleInit() {
-    console.log('🚀 PacienteService iniciado, contando pacientes...');
-    await this.countPacientes();
-  }
+  
 
   async create(createPacienteDto: CreatePacienteDto) {
     const nuevaHistoria = this.historiaRepo.create({ fecha_creacion: new Date() });
@@ -49,7 +46,7 @@ export class PacientesService {
 
   async countPacientes() {
       const cantidad = await this.pacienteRepo.count();
-      console.log('🚀 PacienteService iniciado, contando pacientes...');
+      return cantidad
   }
 
   async findAll() {

@@ -29,14 +29,30 @@ export class AuthService {
     }
   }
 
+  async changePassword(id_user:number,new_password:string){
+    const hashedPassword=await bcrypt.hash(new_password,10)
+
+    const user=await this.usuarioRepo.findOneByOrFail({id:id_user})
+
+    user.password=hashedPassword
+
+    await this.usuarioRepo.save(user)
+
+    return {message:"Its already change"}
+
+  }
+
   findAll() {
     return `This action returns all auth`;
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
+    
     return `This action returns a #${id} auth`;
   }
-
+  async logout() {
+    return { message: 'Logout successful' };
+  }
   
   remove(id: number) {
     return `This action removes a #${id} auth`;

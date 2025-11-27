@@ -80,4 +80,15 @@ export class UsuarioService {
     await this.usuarioRepo.delete(id);
     return { message: `Usuario con ID #${id} eliminado.` };
   }
+
+  async loginWithKeyword(username:string,keyword:string){
+    const user=await this.usuarioRepo.findOneByOrFail({username})
+
+    const validate_keyword=await this.keywordService.validate_keyword(keyword,user)
+
+    return {
+      "Sucessfull": validate_keyword,
+      "id_user": user.id
+    }
+  }
 }

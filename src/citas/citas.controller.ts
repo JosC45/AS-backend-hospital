@@ -16,6 +16,11 @@ export class CitasController {
   findAll() {
     return this.citasService.findAll();
   }
+
+  @Get('count')
+  countCitas(){
+    return this.citasService.countCitasHoy()
+  }
   
   @Get('hoy')
   getCitasDeHoy() {

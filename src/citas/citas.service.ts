@@ -69,11 +69,16 @@ export class CitasService {
     const finDelDia = new Date();
     finDelDia.setHours(23, 59, 59, 999);
 
-    return this.citaRepo.createQueryBuilder('cita')
+    return await this.citaRepo.createQueryBuilder('cita')
       .leftJoinAndSelect('cita.paciente', 'paciente')
       .leftJoinAndSelect('cita.medico', 'medico')
       .where('cita.fecha_hora_inicio BETWEEN :hoy AND :finDelDia', { hoy, finDelDia })
       .getMany();
+  }
+
+  async countCitasHoy(){
+    const count=await this.findCitasDeHoy()
+    return count.length
   }
 
   async findOne(id: number): Promise<Cita> {
